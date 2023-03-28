@@ -21,15 +21,15 @@ export default defineComponent({
         }
 
         return () => {
-            const collapseClassNames = cx('collapse', {
-                'collapse__down': props.collapsed
+            const collapseClassNames = cx('collapse__icon', {
+                'collapse__icon-down': props.collapsed
             })
 
             return (
                 <div class={ cx('layout-header') }>
                     <div class={ cx('layout-header__left') }>
-                        <div class={ collapseClassNames } onClick={ handleCollapseClick }>
-                            <Icon class={ cx('collapse__icon') } type="icon-caidan"/>
+                        <div class={ cx('collapse') } onClick={ handleCollapseClick }>
+                            <Icon class={ collapseClassNames } type="icon-caidan"/>
                         </div>
                     </div>
                     <div class={ cx('layout-header__right') }>
