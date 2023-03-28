@@ -1,4 +1,4 @@
-import { isArray, isObject, isString } from '../util'
+import { isArray, isObject, isString } from '@/util'
 
 function classNames (...args) {
     const classes = []
