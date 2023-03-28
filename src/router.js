@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import { canTurnTo } from '@/layout/util'
 import { getToken, removeToken } from '@/common/auth'
 import { LOGIN_NAME, HOME_NAME } from '@/config'
@@ -6,7 +6,7 @@ import useUserinfo from '@/store/userinfo'
 import routes from '@/routes'
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes: routes
 })
 
