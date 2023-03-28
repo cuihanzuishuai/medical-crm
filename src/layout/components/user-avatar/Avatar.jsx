@@ -22,11 +22,8 @@ export default defineComponent({
         return () => {
             const dropdownSlots = {
                 default: () => {
-                    const outlinedStyles = {
-                        transform: 'translateX(1px)'
-                    }
                     const avatarSlots = {
-                        icon: () => <UserOutlined style={ outlinedStyles }/>
+                        icon: () => <UserOutlined/>
                     }
                     return (
                         <div class={ cx('avatar-wrap') }>
@@ -38,6 +35,7 @@ export default defineComponent({
                 overlay: () => {
                     return (
                         <div class={ cx('user-card') }>
+                            <div class={ cx('item__text') } onClick={ handleLogOut }>退出登录</div>
                             <div class={ cx('item__text') } onClick={ handleLogOut }>退出登录</div>
                         </div>
                     )
