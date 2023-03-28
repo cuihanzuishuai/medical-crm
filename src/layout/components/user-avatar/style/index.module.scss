@@ -1,0 +1,34 @@
+.user-avatar {
+    height: 100%;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.avatar-wrap {
+    height: 100%;
+    @include flex(center);
+
+    .down-icon {
+        @include size(18px);
+        @include text(8px, $icon, 18px, center);
+        margin: auto;
+    }
+}
+
+.user-card {
+    width: 100px;
+    padding: 5px 0;
+    border-radius: 4px;
+    box-shadow: $box-shadow;
+    background: $white;
+
+    .item__text {
+        height: 30px;
+        @include text(12px, $text-secondary, 30px, center);
+        user-select: none;
+
+        &:hover {
+            background: $background;
+        }
+    }
+}

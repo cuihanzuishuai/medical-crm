@@ -1,0 +1,16 @@
+.fullscreen {
+    height: 100%;
+    width: 20px;
+    display: flex;
+    margin-right: 20px;
+
+    .fullscreen__icon {
+        @include text(20px, $icon, 20px);
+        cursor: pointer;
+        margin: auto;
+
+        &:hover {
+            color: $primary;
+        }
+    }
+}

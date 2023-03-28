@@ -61,3 +61,4 @@ export const sessionCache = new GalleryCache(sessionStorage)
 
 // 用户账号
 export const LOCAL_USERNAME = 'username'
+export const LOCAL_PASSWORD = 'password'

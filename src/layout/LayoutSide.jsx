@@ -1,4 +1,5 @@
-import { defineComponent, Fragment } from 'vue'
+import { defineComponent, Fragment, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { Menu } from 'ant-design-vue'
 import { showChildren } from './util'
 import Icon from '@/components/icon'
@@ -55,7 +56,7 @@ const XSubMenu = defineComponent({
                     })
                 }
             }
-            return <SubMenu key={ props.option.key } { ...props } v-slots={ subMenuSlots }/>
+            return <SubMenu key={ props.option.name } { ...props } v-slots={ subMenuSlots }/>
         }
     }
 })
@@ -72,6 +73,45 @@ export default defineComponent({
         }
     },
     setup (props) {
+        const router = useRouter()
+        const route = useRoute()
+
+        const routeMenuKeys = createRouteMenuKeys()
+
+        const rootSubmenuKeys = createSubmenuKey(props.menus)
+        const selectedKeys = ref(routeMenuKeys)
+        const openKeys = ref([])
+
+        function createRouteMenuKeys () {
+            // @todo 非菜单路由高亮逻辑
+            return [route.name]
+        }
+
+        function onSelectMenu (params) {
+            if (route.name !== params.key) {
+                selectedKeys.value = params.selectedKeys
+                router.push({ name: params.key })
+            }
+        }
+
+        function onOpenChange (keys) {
+            const latestKey = keys.find((key) => openKeys.value.indexOf(key) === -1)
+            if (latestKey && rootSubmenuKeys.indexOf(latestKey) === -1) {
+                openKeys.value = keys
+            } else {
+                openKeys.value = latestKey ? [latestKey] : []
+            }
+        }
+
+        function createSubmenuKey (list) {
+            return list.map((item) => {
+                if (item.children && item.children.length === 1) {
+                    return item.children[0].name
+                }
+                return item.name
+            })
+        }
+
         return () => {
             const sideStyles = {
                 width: props.collapsed ? '77px' : '238px'
@@ -85,6 +125,10 @@ export default defineComponent({
             }
             const menuProps = {
                 inlineCollapsed: props.collapsed,
+                selectedKeys: selectedKeys.value,
+                openKeys: openKeys.value,
+                onSelect: onSelectMenu,
+                onOpenChange: onOpenChange,
                 theme: 'dark',
                 mode: 'inline'
             }

@@ -4,3 +4,16 @@
     position: relative;
     overflow: hidden;
 }
+
+.content-space {
+    @include size(100%);
+    padding: 0 18px;
+    overflow-y: auto;
+
+    .content__view {
+    }
+
+    .content__fill {
+        height: 18px;
+    }
+}

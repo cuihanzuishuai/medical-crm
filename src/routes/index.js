@@ -65,6 +65,35 @@ const routes = [
         ]
     },
     {
+        path: '/alpha-menu1',
+        name: 'alpha-menu1',
+        meta: {
+            title: '多级菜单',
+            icon: 'icon-yonghu'
+        },
+        component: LayoutMain,
+        children: [
+            {
+                path: '1level-1',
+                name: '1level-1',
+                meta: {
+                    title: 'level-1',
+                    icon: 'icon-yonghu'
+                },
+                component: () => import('@/views/Home')
+            },
+            {
+                path: '1level-2',
+                name: '1level-2',
+                meta: {
+                    title: 'level-2',
+                    icon: 'icon-yonghu'
+                },
+                component: () => import('@/views/Home')
+            }
+        ]
+    },
+    {
         path: '/401',
         name: 'error-401',
         meta: {

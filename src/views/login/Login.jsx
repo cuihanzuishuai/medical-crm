@@ -1,7 +1,8 @@
-import { defineComponent, reactive, ref } from 'vue'
+import { defineComponent, reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Form, Input, Checkbox, Button } from 'ant-design-vue'
 import Icon from '@/components/icon'
+import { localCache, LOCAL_USERNAME, LOCAL_PASSWORD } from '@/common/storage'
 import { setToken } from '@/common/auth'
 import classNames from '@/common/classNamesBind'
 import styles from './style/index.module.scss'
@@ -40,7 +41,22 @@ export default defineComponent({
             }]
         }
 
-        function onFinish () {
+        onMounted(() => {
+            const username = localCache.get(LOCAL_USERNAME)
+            const password = localCache.get(LOCAL_PASSWORD)
+            if (username && password) {
+                loginForm.username = username
+                loginForm.password = password
+                checked.value = true
+            }
+        })
+
+        function onRecall () {
+            localCache.set(LOCAL_USERNAME, loginForm.username)
+            localCache.set(LOCAL_PASSWORD, loginForm.password)
+        }
+
+        function onSubmit () {
             const data = {
                 username: loginForm.username,
                 password: loginForm.password
@@ -64,7 +80,7 @@ export default defineComponent({
                             <div class={ cx('title__text') }>欢迎登陆</div>
                         </div>
                         <div class={ cx('form-wrap') }>
-                            <Form model={ loginForm } rules={ rules } onFinish={ onFinish }>
+                            <Form model={ loginForm } rules={ rules } onFinish={ onSubmit }>
                                 <FormItem name="username" wrapperCol={ WRAPPER_COL }>
                                     <Input
                                         placeholder="请输入用户名"
@@ -80,7 +96,7 @@ export default defineComponent({
                                     />
                                 </FormItem>
                                 <div class={ cx('checked-wrap') }>
-                                    <Checkbox>记住账号</Checkbox>
+                                    <Checkbox v-model:checked={ checked.value }>记住账号</Checkbox>
                                     <a href="http://www.baidu.com" target="_blank">忘记密码</a>
                                 </div>
                                 <FormItem wrapperCol={ WRAPPER_COL } validateStatus="error" help={ errorType.value }>
