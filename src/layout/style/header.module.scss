@@ -1,0 +1,8 @@
+.layout-header {
+    @include size(100%, 60px);
+    @include flex(null, space-between);
+    user-select: none;
+    padding: 0 20px;
+    border-bottom: 1px solid $border;
+    background: $white;
+}

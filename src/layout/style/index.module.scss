@@ -1,0 +1,18 @@
+.layout-main {
+    @include size(100%);
+    @include flex;
+    flex-direction: row;
+    overflow: hidden;
+
+    .layout-main__prime {
+        flex: 1;
+        @include flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .layout-main__content {
+            flex: 1;
+            overflow: hidden;
+        }
+    }
+}

@@ -1,0 +1,34 @@
+.error-page {
+    @include size(100%, 100%);
+    position: relative;
+    background: $background;
+}
+
+.content-con {
+    @include position(absolute, 50%, null, null, 50%);
+    @include size(700px, 600px);
+    transform: translate(-50%, -60%);
+
+    .error-img {
+        @include size(100%, 100%);
+    }
+
+    .text-con {
+        @include position(absolute, 0, null, null, 0);
+
+        .text-code {
+            @include position(absolute, 0, null, null, 0);
+            @include text(80px, $primary, 100px, null, 700);
+        }
+
+        .text-desc {
+            @include position(absolute, 100px, null, null, 0);
+            width: 700px;
+            @include text(20px, $text-secondary, 32px, left, 700);
+        }
+    }
+
+    .back-btn-group {
+        @include position(absolute, null, 0, 20px, null);
+    }
+}

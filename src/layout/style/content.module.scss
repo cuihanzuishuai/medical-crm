@@ -1,0 +1,6 @@
+.layout-content {
+    @include size(100%);
+    background: $background;
+    position: relative;
+    overflow: hidden;
+}

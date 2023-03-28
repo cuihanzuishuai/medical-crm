@@ -1,0 +1,44 @@
+.login {
+    @include size(100%);
+    background-image: url('../images/login-bg.png');
+    background-color: $background;
+    background-size: cover;
+    background-position: 50%;
+    position: relative;
+}
+
+.login-wrap {
+    @include position(absolute, 50%, 160px, null, null);
+    width: 340px;
+    background: $white;
+    border-radius: 4px;
+    transform: translateY(-60%);
+
+    .title {
+        padding: 14px 16px;
+        border-bottom: 1px solid $border;
+
+        .title__text {
+            font-weight: 700;
+        }
+    }
+
+    .form-wrap {
+        padding: 16px;
+
+        .checked-wrap {
+            @include flex(center, space-between);
+            margin-bottom: 18px;
+        }
+    }
+}
+
+.footer-wrap {
+    @include position(absolute, null, 0, 0, 0);
+
+    .footer-wrap__text {
+        padding: 10px;
+        text-align: center;
+        color: #EEE;
+    }
+}
