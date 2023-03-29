@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { requestUserInfo } from '@/api/user'
 
 const useUserinfo = defineStore('userinfo', {
     state: () => {
@@ -6,14 +7,27 @@ const useUserinfo = defineStore('userinfo', {
             // 有无用户数据
             hasGetInfo: false,
             // 用户权限信息
-            access: []
+            access: [],
+            // 超管
+            isAdmin: false,
+            // 离职状态 1正常 2离职
+            status: 1
         }
     },
     actions: {
         getUserInfo () {
             return new Promise((resolve, reject) => {
-                console.log(this)
-                resolve()
+                requestUserInfo()
+                    .then((res) => {
+                        this.hasGetInfo = true
+                        this.access = [parseInt(res.role)]
+                        this.isAdmin = res.is_admin
+                        this.status = res.status
+                        resolve(this.access)
+                    })
+                    .catch((err) => {
+                        reject(err)
+                    })
             })
         }
     }

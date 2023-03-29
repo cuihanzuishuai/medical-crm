@@ -2,8 +2,10 @@ import { defineComponent, reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Form, Input, Checkbox, Button } from 'ant-design-vue'
 import Icon from '@/components/icon'
-import { localCache, LOCAL_USERNAME, LOCAL_PASSWORD } from '@/common/storage'
-import { setToken } from '@/common/auth'
+import { HOME_NAME, recallExpires } from '@/config'
+import { setToken, getCookie, setCookie, removeCookie, PASSWORD, USERNAME } from '@/common/auth'
+import { requestLogin } from '@/api/user'
+import { AesDecode, AesEncode } from '@/common/ase'
 import classNames from '@/common/classNamesBind'
 import styles from './style/index.module.scss'
 
@@ -42,27 +44,53 @@ export default defineComponent({
         }
 
         onMounted(() => {
-            const username = localCache.get(LOCAL_USERNAME)
-            const password = localCache.get(LOCAL_PASSWORD)
+            const username = getCookie(USERNAME)
+            const password = getCookie(PASSWORD)
             if (username && password) {
-                loginForm.username = username
-                loginForm.password = password
+                loginForm.username = AesDecode(username)
+                loginForm.password = AesDecode(password)
                 checked.value = true
             }
         })
 
-        function onRecall () {
-            localCache.set(LOCAL_USERNAME, loginForm.username)
-            localCache.set(LOCAL_PASSWORD, loginForm.password)
+        function onRecall (checked) {
+            if (checked) {
+                const username = getCookie(USERNAME)
+                const password = getCookie(PASSWORD)
+                const nextUsername = AesEncode(loginForm.username)
+                const nextPassword = AesEncode(loginForm.password)
+                if (username !== nextUsername && password !== nextPassword) {
+                    setCookie(USERNAME, nextUsername, recallExpires)
+                    setCookie(PASSWORD, nextPassword, recallExpires)
+                }
+            } else {
+                removeCookie(USERNAME)
+                removeCookie(PASSWORD)
+            }
         }
 
         function onSubmit () {
             const data = {
-                username: loginForm.username,
+                mobile: loginForm.username,
                 password: loginForm.password
             }
-            console.log('登录')
-            console.log(data)
+            loading.value = true
+            requestLogin(data)
+                .then((res) => {
+                    if (res.token) {
+                        onRecall(checked.value)
+                        setToken(res.token)
+                        router.push({ name: HOME_NAME })
+                    } else {
+                        console.log('not token')
+                    }
+                })
+                .catch((err) => {
+
+                })
+                .finally(() => {
+                    loading.value = false
+                })
         }
 
         return () => {
@@ -83,7 +111,7 @@ export default defineComponent({
                             <Form model={ loginForm } rules={ rules } onFinish={ onSubmit }>
                                 <FormItem name="username" wrapperCol={ WRAPPER_COL }>
                                     <Input
-                                        placeholder="请输入用户名"
+                                        placeholder="请输入手机号"
                                         v-model:value={ loginForm.username }
                                         v-slots={ usernameSlots }
                                     />
@@ -97,19 +125,21 @@ export default defineComponent({
                                 </FormItem>
                                 <div class={ cx('checked-wrap') }>
                                     <Checkbox v-model:checked={ checked.value }>记住账号</Checkbox>
-                                    <a href="http://www.baidu.com" target="_blank">忘记密码</a>
+                                    {/*<a href="http://www.baidu.com" target="_blank">忘记密码</a>*/ }
                                 </div>
                                 <FormItem wrapperCol={ WRAPPER_COL } validateStatus="error" help={ errorType.value }>
-                                    <Button type="primary" html-type="submit" block={ true }>登录</Button>
+                                    <Button type="primary" html-type="submit" block={ true } loading={ loading.value }>
+                                        登录
+                                    </Button>
                                 </FormItem>
                             </Form>
                         </div>
                     </div>
-                    <div class={ cx('footer-wrap') }>
-                        <div
-                            class={ cx('footer-wrap__text') }>copyright@2019&nbsp;XX科技&nbsp;All&nbsp;Rights&nbsp;Reserved
-                        </div>
-                    </div>
+                    {/*<div class={ cx('footer-wrap') }>*/ }
+                    {/*    <div class={ cx('footer-wrap__text') }>*/ }
+                    {/*        copyright@2019&nbsp;XX科技&nbsp;All&nbsp;Rights&nbsp;Reserved*/ }
+                    {/*    </div>*/ }
+                    {/*</div>*/ }
                 </div>
             )
         }

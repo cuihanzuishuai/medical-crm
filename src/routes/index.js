@@ -36,10 +36,10 @@ const routes = [
         ]
     },
     {
-        path: '/alpha-menu',
-        name: 'alpha-menu',
+        path: '/market',
+        name: 'market',
         meta: {
-            title: '多级菜单',
+            title: '市场模块',
             icon: 'icon-yonghu'
         },
         component: LayoutMain,
@@ -48,7 +48,7 @@ const routes = [
                 path: 'level-1',
                 name: 'level-1',
                 meta: {
-                    title: 'level-1',
+                    title: '报单功能',
                     icon: 'icon-yonghu'
                 },
                 component: () => import('@/views/Home')
@@ -57,7 +57,7 @@ const routes = [
                 path: 'level-2',
                 name: 'level-2',
                 meta: {
-                    title: 'level-2',
+                    title: '患者信息',
                     icon: 'icon-yonghu'
                 },
                 component: () => import('@/views/Home')
@@ -65,28 +65,37 @@ const routes = [
         ]
     },
     {
-        path: '/alpha-menu1',
-        name: 'alpha-menu1',
+        path: '/customer',
+        name: 'customer',
         meta: {
-            title: '多级菜单',
+            title: '客服模块',
             icon: 'icon-yonghu'
         },
         component: LayoutMain,
         children: [
             {
-                path: '1level-1',
-                name: '1level-1',
+                path: 'level-1',
+                name: 'level-1',
                 meta: {
-                    title: 'level-1',
+                    title: '待复诊患者',
                     icon: 'icon-yonghu'
                 },
                 component: () => import('@/views/Home')
             },
             {
-                path: '1level-2',
-                name: '1level-2',
+                path: 'level-2',
+                name: 'level-2',
                 meta: {
-                    title: 'level-2',
+                    title: '任务分配',
+                    icon: 'icon-yonghu'
+                },
+                component: () => import('@/views/Home')
+            },
+            {
+                path: 'level-2',
+                name: 'level-2',
+                meta: {
+                    title: '回访记录',
                     icon: 'icon-yonghu'
                 },
                 component: () => import('@/views/Home')

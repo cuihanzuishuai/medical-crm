@@ -1,6 +1,9 @@
 // token过期时间 默认一天
 export const cookieExpires = 1
 
+// 记住密码过期时间 默认30天
+export const recallExpires = 30
+
 // icon 在线地址
 export const scriptUrl = '//at.alicdn.com/t/c/font_3980375_ek7nt4um40m.js'
 
@@ -13,13 +16,13 @@ export const LOGIN_NAME = 'login'
 // 环境变量
 const ENV_OBJ = {
     development: {
-        baseURL: ''
+        baseURL: 'http://124.222.33.20:8080'
     },
     test: {
-        baseURL: ''
+        baseURL: 'http://124.222.33.20:8080'
     },
     prod: {
-        baseURL: ''
+        baseURL: 'http://124.222.33.20:8080'
     }
 }
 
