@@ -18,10 +18,7 @@ const ENV_OBJ = {
     development: {
         baseURL: 'http://124.222.33.20:8080'
     },
-    test: {
-        baseURL: 'http://124.222.33.20:8080'
-    },
-    prod: {
+    production: {
         baseURL: 'http://124.222.33.20:8080'
     }
 }
