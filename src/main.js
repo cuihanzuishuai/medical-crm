@@ -9,7 +9,7 @@ import '@/assets/css/base.css'
 import '@/assets/css/transition.scss'
 
 const app = createApp(Root)
+app.use(plugin)
 app.use(router)
 app.use(pinia)
-app.use(plugin)
 app.mount('#app')

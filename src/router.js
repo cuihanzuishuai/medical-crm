@@ -5,6 +5,7 @@ import { getToken, removeToken } from '@/common/auth'
 import { LOGIN_NAME, HOME_NAME } from '@/config'
 import useUserinfo from '@/store/userinfo'
 import routes from '@/routes'
+import Loading from '@/components/loading'
 
 const router = createRouter({
     history: createWebHistory(),
@@ -35,11 +36,14 @@ router.beforeEach((to, from, next) => {
         if (userinfo.hasGetInfo) {
             turnTo(to, next, userinfo.access)
         } else {
-            // loading
+            const loadingDestroy = Loading()
             userinfo.getUserInfo()
                 .then((access) => {
-                    console.log(access)
                     turnTo(to, next, access)
+
+                    setTimeout(() => {
+                        userinfo.getUserInfo()
+                    }, 1000)
                 })
                 .catch((err) => {
                     removeToken()
@@ -52,7 +56,7 @@ router.beforeEach((to, from, next) => {
                     })
                 })
                 .finally(() => {
-                    // loading.hide()
+                    loadingDestroy()
                 })
         }
     }

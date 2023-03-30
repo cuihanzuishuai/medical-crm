@@ -1,4 +1,4 @@
-import { defineComponent, ref, provide, onUnmounted } from 'vue'
+import { defineComponent, ref } from 'vue'
 import LayoutHeader from './LayoutHeader'
 import LayoutSide from './LayoutSide'
 import LayoutContent from './LayoutContent'
@@ -16,6 +16,10 @@ export default defineComponent({
         const menus = getMenuList(routes, userinfo.access)
 
         const collapsed = ref(false)
+
+        // userinfo.$subscribe((mutation, state) => {
+        //     console.log(mutation, state)
+        // })
 
         function onCollapseChange (value) {
             collapsed.value = value

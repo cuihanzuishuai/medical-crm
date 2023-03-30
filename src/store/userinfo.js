@@ -19,11 +19,13 @@ const useUserinfo = defineStore('userinfo', {
             return new Promise((resolve, reject) => {
                 requestUserInfo()
                     .then((res) => {
-                        this.hasGetInfo = true
-                        this.access = [parseInt(res.role)]
-                        this.isAdmin = res.is_admin
-                        this.status = res.status
-                        resolve(this.access)
+                        this.$patch((state) => {
+                            state.hasGetInfo = true
+                            state.access = [parseInt(res.role)]
+                            state.isAdmin = res.is_admin
+                            state.status = res.status
+                            resolve(state.access)
+                        })
                     })
                     .catch((err) => {
                         reject(err)
