@@ -1,6 +1,7 @@
 import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Space, Button } from 'ant-design-vue'
+import { HOME_NAME } from '@/config'
 import classNames from '@/common/classNamesBind'
 import styles from './style/index.module.scss'
 
@@ -27,7 +28,7 @@ export default defineComponent({
         let timer = null
 
         function backHome () {
-            router.replace({ name: homeName })
+            router.replace({ name: HOME_NAME })
         }
 
         function backPrev () {
@@ -59,7 +60,7 @@ export default defineComponent({
                         </div>
                         <Space class={ cx('back-btn-group') } size={ 10 }>
                             <Button onClick={ backHome }>返回首页</Button>
-                            <Button onClick={ backPrev }>返回上一页({ second.value }s)</Button>
+                            <Button style={{ width: '130px' }} onClick={ backPrev }>返回上一页({ second.value }s)</Button>
                         </Space>
                     </div>
                 </div>
