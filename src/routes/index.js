@@ -40,27 +40,25 @@ const routes = [
         name: 'market',
         meta: {
             title: '市场模块',
-            icon: 'icon-yonghu'
+            icon: 'icon-shichang'
         },
         component: LayoutMain,
         children: [
             {
-                path: 'level-1',
-                name: 'level-1',
+                path: 'report-form',
+                name: 'report-form',
                 meta: {
-                    title: '报单功能',
-                    icon: 'icon-yonghu'
+                    title: '报单功能'
                 },
-                component: () => import('@/views/Home')
+                component: () => import('@/views/market/report-form')
             },
             {
-                path: 'level-2',
-                name: 'level-2',
+                path: 'patient-info',
+                name: 'patient-info',
                 meta: {
-                    title: '患者信息',
-                    icon: 'icon-yonghu'
+                    title: '患者信息'
                 },
-                component: () => import('@/views/Home')
+                component: () => import('@/views/market/patient-info')
             }
         ]
     },
@@ -69,36 +67,122 @@ const routes = [
         name: 'customer',
         meta: {
             title: '客服模块',
-            icon: 'icon-yonghu'
+            icon: 'icon-kefu'
         },
         component: LayoutMain,
         children: [
             {
-                path: 'level-1',
-                name: 'level-1',
+                path: 'patient-revisit',
+                name: 'patient-revisit',
                 meta: {
-                    title: '待复诊患者',
-                    icon: 'icon-yonghu'
+                    title: '待复诊患者'
                 },
-                component: () => import('@/views/Home')
+                component: () => import('@/views/customer/patient-revisit')
             },
             {
-                path: 'level-2',
-                name: 'level-2',
+                path: 'allocation-task',
+                name: 'allocation-task',
                 meta: {
-                    title: '任务分配',
-                    icon: 'icon-yonghu'
+                    title: '任务分配'
                 },
-                component: () => import('@/views/Home')
+                component: () => import('@/views/customer/allocation-task')
             },
             {
-                path: 'level-2',
-                name: 'level-2',
+                path: 'visit-record',
+                name: 'visit-record',
                 meta: {
-                    title: '回访记录',
-                    icon: 'icon-yonghu'
+                    title: '回访记录'
                 },
-                component: () => import('@/views/Home')
+                component: () => import('@/views/customer/visit-record')
+            }
+        ]
+    },
+    {
+        path: '/workload',
+        name: 'workload',
+        meta: {
+            title: '工作量',
+            icon: 'icon-gongzuoliang'
+        },
+        component: LayoutMain,
+        children: [
+            {
+                path: 'market-staff',
+                name: 'market-staff',
+                meta: {
+                    title: '市场部工作量'
+                },
+                component: () => import('@/views/workload/market-staff')
+            },
+            {
+                path: 'customer-staff',
+                name: 'customer-staff',
+                meta: {
+                    title: '客服部工作量'
+                },
+                component: () => import('@/views/workload/customer-staff')
+            }
+        ]
+    },
+    {
+        path: '/finance',
+        name: 'finance',
+        meta: {
+            title: '财务模块',
+            icon: 'icon-caiwu'
+        },
+        component: LayoutMain,
+        children: [
+            {
+                path: 'market-formula',
+                name: 'market-formula',
+                meta: {
+                    title: '计算公式'
+                },
+                component: () => import('@/views/finance/market-formula')
+            },
+            {
+                path: 'perform-wage',
+                name: 'perform-wage',
+                meta: {
+                    title: '工资绩效'
+                },
+                component: () => import('@/views/finance/perform-wage')
+            }
+        ]
+    },
+    {
+        path: '/permission',
+        name: 'permission',
+        meta: {
+            title: '权限模块',
+            icon: 'icon-quanxian'
+        },
+        component: LayoutMain,
+        children: [
+            {
+                path: 'add-staff',
+                name: 'add-staff',
+                meta: {
+                    title: '添加员工'
+                },
+                component: () => import('@/views/permission/add-staff')
+            },
+            {
+                path: 'allocation-role',
+                name: 'allocation-role',
+                meta: {
+                    title: '角色分配'
+                },
+                component: () => import('@/views/permission/allocation-role')
+            },
+            {
+                path: 'staff-management',
+                name: 'staff-management',
+                meta: {
+                    title: '员工管理'
+                },
+                component: () => import('@/views/permission/staff-management')
             }
         ]
     },

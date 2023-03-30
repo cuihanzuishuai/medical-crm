@@ -5,7 +5,7 @@ export const cookieExpires = 1
 export const recallExpires = 30
 
 // icon 在线地址
-export const scriptUrl = '//at.alicdn.com/t/c/font_3980375_ek7nt4um40m.js'
+export const scriptUrl = '//at.alicdn.com/t/c/font_3980375_6hsq9pn7l6n.js'
 
 // 首页
 export const HOME_NAME = 'home'
