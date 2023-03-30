@@ -70,6 +70,7 @@ export default defineComponent({
         }
 
         function onSubmit () {
+            errorType.value = undefined
             const data = {
                 mobile: loginForm.username,
                 password: loginForm.password
@@ -82,11 +83,11 @@ export default defineComponent({
                         setToken(res.token)
                         router.push({ name: HOME_NAME })
                     } else {
-                        console.log('not token')
+                        errorType.value = '系统异常'
                     }
                 })
                 .catch((err) => {
-
+                    errorType.value = err.message
                 })
                 .finally(() => {
                     loading.value = false

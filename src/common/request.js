@@ -43,6 +43,10 @@ instance.interceptors.response.use(
         return res
     },
     (err) => {
+        const data = err.response && err.response.data
+        if (data && data.message) {
+            err.message = data.message
+        }
         // addErrorLog(err.response)
         return Promise.reject(err)
     }
