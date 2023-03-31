@@ -14,7 +14,7 @@ export default defineComponent({
                 <div class={ cx('layout-content') }>
                     <div class={ cx('content-space') } ref={ spaceRef }>
                         <div class={ cx('content__fill') }/>
-                        <div id="ContentView" class={ cx('content__view') }>
+                        <div id="contentView" class={ cx('content__view') }>
                             <router-view/>
                         </div>
                         <BackTop target={ () => spaceRef.value }/>
