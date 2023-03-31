@@ -1,4 +1,8 @@
 import { defineComponent } from 'vue'
+import {
+    Card,
+    Table
+} from 'ant-design-vue'
 import classNames from '@/common/classNamesBind'
 import styles from './style/index.module.scss'
 
@@ -8,7 +12,11 @@ export default defineComponent({
     setup () {
         return () => {
             return (
-                <div>StaffManagement</div>
+                <div class={ cx('view-wrap') }>
+                    <Card>
+                        <Table/>
+                    </Card>
+                </div>
             )
         }
     }
