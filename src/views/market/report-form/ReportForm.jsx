@@ -1,5 +1,19 @@
 import { defineComponent, ref, reactive } from 'vue'
-import { Card, Table, Button, Input, DatePicker, Checkbox, message, Popconfirm, Modal, Form } from 'ant-design-vue'
+import {
+    Card,
+    Table,
+    Button,
+    Input,
+    DatePicker,
+    Checkbox,
+    message,
+    Popconfirm,
+    Modal,
+    Form,
+    Space,
+    Tooltip
+} from 'ant-design-vue'
+import { UploadOutlined } from '@ant-design/icons-vue'
 import TableSearch from '@/components/table-search'
 import { requestReportList, requestReportRecover, requestReportCreate } from '@/api/report'
 import { formatCurrency } from '@/util/format'
@@ -275,6 +289,10 @@ export default defineComponent({
             modalFormRef.value && modalFormRef.value.show()
         }
 
+        function handleUploadReport () {
+            console.log('上传')
+        }
+
         return () => {
             const searchOptions = [
                 {
@@ -393,7 +411,22 @@ export default defineComponent({
                         <div class={ cx('table-list-toolbar') }>
                             <div class={ cx('table-list-toolbar-container') }>
                                 <div class={ cx('table-list-toolbar-title') }>报单列表</div>
-                                <Button type="primary" onClick={ handleCreateRequest }>报单登记</Button>
+                                <Space size={ 12 }>
+                                    <Button type="primary" onClick={ handleCreateRequest }>
+                                        报单登记
+                                    </Button>
+                                    <Tooltip getPopupContainer={ () => document.getElementById('ContentView') }>
+                                        { {
+                                            title: () => <span>上传报单</span>,
+                                            default: () => (
+                                                <UploadOutlined
+                                                    class={ cx('upload') }
+                                                    onClick={ handleUploadReport }
+                                                />
+                                            )
+                                        } }
+                                    </Tooltip>
+                                </Space>
                             </div>
                         </div>
                         <Table

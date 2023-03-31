@@ -14,5 +14,15 @@
             @include flex(center, flex-start);
             @include text(16px, $text, null, null, 500);
         }
+
+        .upload {
+            width: 32px;
+            @include text(18px, $icon);
+            cursor: pointer;
+
+            &:hover {
+                color: $primary;
+            }
+        }
     }
 }
