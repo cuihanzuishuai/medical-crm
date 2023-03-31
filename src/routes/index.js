@@ -22,7 +22,10 @@ const routes = [
         path: '/',
         name: '_home',
         component: LayoutMain,
-        redirect: { name: 'home' },
+        redirect: { name: 'report-form' },
+        meta: {
+            hideInMenu: true
+        },
         children: [
             {
                 path: 'home',
