@@ -11,7 +11,9 @@ const useUserinfo = defineStore('userinfo', {
             // 超管
             isAdmin: false,
             // 离职状态 1正常 2离职
-            status: 1
+            status: 1,
+            // 用户名
+            name: ''
         }
     },
     actions: {
@@ -24,6 +26,7 @@ const useUserinfo = defineStore('userinfo', {
                             state.access = [parseInt(res.role)]
                             state.isAdmin = res.is_admin
                             state.status = res.status
+                            state.name = res.name
                             resolve(state.access)
                         })
                     })

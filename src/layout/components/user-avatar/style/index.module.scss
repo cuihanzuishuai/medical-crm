@@ -25,10 +25,17 @@
     .item__text {
         height: 30px;
         @include text(12px, $text-secondary, 30px, center);
+        @include ellipsis-overflow;
         user-select: none;
 
         &:hover {
             background: $background;
+        }
+
+        &.no-style {
+            &:hover {
+                background: none;
+            }
         }
     }
 }
