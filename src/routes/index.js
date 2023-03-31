@@ -29,7 +29,7 @@ const routes = [
                 name: 'home',
                 meta: {
                     title: '首页',
-                    icon: 'icon-yonghu'
+                    icon: 'icon-shouye'
                 },
                 component: () => import('@/views/Home')
             }
