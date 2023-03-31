@@ -8,3 +8,7 @@ echo "推送成功"
 
 ## sudo rm -rf /var/www/html/dist
 ## sudo mv /home/ubuntu/Project/foreend/dist /var/www/html/
+
+
+
+## sudo nginx -s reload

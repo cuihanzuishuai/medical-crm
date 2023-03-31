@@ -48,7 +48,7 @@ router.beforeEach((to, from, next) => {
                 .catch((err) => {
                     removeToken()
                     Modal.error({
-                        title: '错误',
+                        title: 'Error',
                         content: err.message,
                         onOk: () => {
                             next({ name: LOGIN_NAME })

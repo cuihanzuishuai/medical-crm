@@ -1,6 +1,8 @@
 import axios from 'axios'
-import { baseURL } from '@/config'
-import { getToken } from '@/common/auth'
+import { baseURL, LOGIN_NAME } from '@/config'
+import { getToken, removeToken } from '@/common/auth'
+import { Modal } from 'ant-design-vue'
+import router from '@/router'
 
 function addErrorLog (err) {
     if (err) {
@@ -12,6 +14,17 @@ function addErrorLog (err) {
         }
         console.log(errorLog)
     }
+}
+
+function onExpireToken (err) {
+    Modal.error({
+        title: 'Error',
+        content: err.message,
+        onOk: () => {
+            removeToken()
+            router.replace({ name: LOGIN_NAME })
+        }
+    })
 }
 
 const instance = axios.create({
@@ -46,6 +59,11 @@ instance.interceptors.response.use(
         const data = err.response && err.response.data
         if (data && data.message) {
             err.message = data.message
+            err.code = data.code
+        }
+        if (/ExpireToken/.test(err.code)) {
+            onExpireToken(err)
+            return new Promise(() => ({}))
         }
         // addErrorLog(err.response)
         return Promise.reject(err)
