@@ -60,6 +60,17 @@ export default defineComponent({
 
         const dataSource = ref([])
 
+        const pagination = reactive({
+            showQuickJumper: false,
+            showSizeChanger: false,
+            current: 1,
+            pageSize: 20,
+            total: 0,
+            showTotal: (total, range) => {
+                return `共${ total }条`
+            }
+        })
+
         const formData = reactive({
             consumer_mobile: '', // 客户电话
             creat_time: null, // 报单开始时间 // 报单结束时间
@@ -68,7 +79,7 @@ export default defineComponent({
             is_match: false // 是否匹配
         })
 
-        getDataSource(formData)
+        getDataSource()
 
         function onNumberInput (key) {
             return function (evt) {
@@ -88,20 +99,25 @@ export default defineComponent({
             }
         }
 
-        function getDataSource (values) {
-            const time = getStartAndEndTime(values.creat_time)
+        function getDataSource () {
+            const time = getStartAndEndTime(formData.creat_time)
             const data = {
-                consumer_mobile: values.consumer_mobile,
+                consumer_mobile: formData.consumer_mobile,
                 create_start_time: time.startTime,// 报单开始时间
                 creat_end_time: time.endTime, // 报单结束时间
-                user_id: values.user_id ? parseInt(values.user_id) : 0,  // 员工id
-                user_name: values.user_name, // 员工姓名
-                is_match: values.is_match ? 1 : 0 // 是否匹配
+                user_id: formData.user_id ? parseInt(formData.user_id) : 0,  // 员工id
+                user_name: formData.user_name, // 员工姓名
+                is_match: formData.is_match ? 1 : 0, // 是否匹配
+                page: {
+                    current_page: pagination.current,
+                    page_size: pagination.pageSize
+                }
             }
             loading.value = true
             requestReportList(data)
                 .then((res) => {
                     dataSource.value = res.list
+                    pagination.total = res.page.total
                 })
                 .catch((err) => {
                     message.error({
@@ -114,7 +130,14 @@ export default defineComponent({
         }
 
         function onFinish (values) {
-            getDataSource(values)
+            pagination.current = 1
+            pagination.total = 0
+            getDataSource()
+        }
+
+        function onChange (page) {
+            pagination.current = page.current
+            getDataSource()
         }
 
         return () => {
@@ -212,6 +235,8 @@ export default defineComponent({
                             loading={ loading.value }
                             columns={ columns }
                             dataSource={ dataSource.value }
+                            pagination={ pagination }
+                            onChange={ onChange }
                             v-slots={ tableSlots }
                         />
                     </Card>
