@@ -1,5 +1,27 @@
 import LayoutMain from '@/layout'
-
+import Error401 from '@/views/error-page/401'
+import Error404 from '@/views/error-page/404'
+import Error500 from '@/views/error-page/500'
+// --
+import Login from '@/views/login'
+import Home from '@/views/Home'
+// 市场模块
+import ReportForm from '@/views/market/report-form'
+import PatientInfo from '@/views/market/patient-info'
+// 客服模块
+import PatientRevisit from '@/views/customer/patient-revisit'
+import AllocationTask from '@/views/customer/allocation-task'
+import VisitRecord from '@/views/customer/visit-record'
+// 工作量
+import MarketStaff from '@/views/workload/market-staff'
+import CustomerStaff from '@/views/workload/customer-staff'
+// 财务模块
+import MarketFormula from '@/views/finance/market-formula'
+import PerformWage from '@/views/finance/perform-wage'
+// 权限模块
+import AddStaff from '@/views/permission/add-staff'
+import AllocationRole from '@/views/permission/allocation-role'
+import StaffManagement from '@/views/permission/staff-management'
 /**
  * meta: {
  *  title: 导航栏title
@@ -16,7 +38,7 @@ const routes = [
         meta: {
             hideInMenu: true
         },
-        component: () => import('@/views/login')
+        component: Login
     },
     {
         path: '/',
@@ -34,7 +56,7 @@ const routes = [
                     title: '首页',
                     icon: 'icon-shouye'
                 },
-                component: () => import('@/views/Home')
+                component: Home
             }
         ]
     },
@@ -53,7 +75,7 @@ const routes = [
                 meta: {
                     title: '报单功能'
                 },
-                component: () => import('@/views/market/report-form')
+                component: ReportForm
             },
             {
                 path: 'patient-info',
@@ -61,7 +83,7 @@ const routes = [
                 meta: {
                     title: '患者信息'
                 },
-                component: () => import('@/views/market/patient-info')
+                component: PatientInfo
             }
         ]
     },
@@ -80,7 +102,7 @@ const routes = [
                 meta: {
                     title: '待复诊患者'
                 },
-                component: () => import('@/views/customer/patient-revisit')
+                component: PatientRevisit
             },
             {
                 path: 'allocation-task',
@@ -88,7 +110,7 @@ const routes = [
                 meta: {
                     title: '任务分配'
                 },
-                component: () => import('@/views/customer/allocation-task')
+                component: AllocationTask
             },
             {
                 path: 'visit-record',
@@ -96,7 +118,7 @@ const routes = [
                 meta: {
                     title: '回访记录'
                 },
-                component: () => import('@/views/customer/visit-record')
+                component: VisitRecord
             }
         ]
     },
@@ -115,7 +137,7 @@ const routes = [
                 meta: {
                     title: '市场部工作量'
                 },
-                component: () => import('@/views/workload/market-staff')
+                component: MarketStaff
             },
             {
                 path: 'customer-staff',
@@ -123,7 +145,7 @@ const routes = [
                 meta: {
                     title: '客服部工作量'
                 },
-                component: () => import('@/views/workload/customer-staff')
+                component: CustomerStaff
             }
         ]
     },
@@ -142,7 +164,7 @@ const routes = [
                 meta: {
                     title: '计算公式'
                 },
-                component: () => import('@/views/finance/market-formula')
+                component: MarketFormula
             },
             {
                 path: 'perform-wage',
@@ -150,7 +172,7 @@ const routes = [
                 meta: {
                     title: '工资绩效'
                 },
-                component: () => import('@/views/finance/perform-wage')
+                component: PerformWage
             }
         ]
     },
@@ -169,7 +191,7 @@ const routes = [
                 meta: {
                     title: '添加员工'
                 },
-                component: () => import('@/views/permission/add-staff')
+                component: AddStaff
             },
             {
                 path: 'allocation-role',
@@ -177,7 +199,7 @@ const routes = [
                 meta: {
                     title: '角色分配'
                 },
-                component: () => import('@/views/permission/allocation-role')
+                component: AllocationRole
             },
             {
                 path: 'staff-management',
@@ -185,7 +207,7 @@ const routes = [
                 meta: {
                     title: '员工管理'
                 },
-                component: () => import('@/views/permission/staff-management')
+                component: StaffManagement
             }
         ]
     },
@@ -195,7 +217,7 @@ const routes = [
         meta: {
             hideInMenu: true
         },
-        component: () => import('@/views/error-page/401')
+        component: Error401
     },
     {
         path: '/500',
@@ -203,7 +225,7 @@ const routes = [
         meta: {
             hideInMenu: true
         },
-        component: () => import('@/views/error-page/500')
+        component: Error500
     },
     {
         path: '/:pathMatch(.*)*',
@@ -211,7 +233,7 @@ const routes = [
         meta: {
             hideInMenu: true
         },
-        component: () => import('@/views/error-page/404')
+        component: Error404
     }
 ]
 
