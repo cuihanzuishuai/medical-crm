@@ -1,7 +1,8 @@
 import { defineComponent, ref, reactive } from 'vue'
-import { Card, Table, Button, Input, DatePicker, Checkbox, message, Popconfirm } from 'ant-design-vue'
+import { Card, Table, Button, Input, DatePicker, Checkbox, message, Popconfirm, Modal, Form } from 'ant-design-vue'
 import TableSearch from '@/components/table-search'
-import { requestReportList, requestReportRecover } from '@/api/report'
+import { requestReportList, requestReportRecover, requestReportCreate } from '@/api/report'
+import { isPromise } from '@/util'
 import { formatCurrency } from '@/util/format'
 import classNames from '@/common/classNamesBind'
 import styles from './style/index.module.scss'
@@ -9,6 +10,7 @@ import dayjs from 'dayjs'
 
 const cx = classNames.bind(styles)
 
+const FormItem = Form.Item
 const RangePicker = DatePicker.RangePicker
 
 const columns = [
@@ -60,12 +62,96 @@ const columns = [
     }
 ]
 
+const ModalForm = defineComponent({
+    props: {
+        onFinish: Function
+    },
+    setup (props, { expose }) {
+        const formRef = ref(null)
+
+        const visible = ref(false)
+
+        const formData = reactive({
+            consumer_mobile: '',
+            consumer_name: '',
+            except_arrive_time: null
+        })
+
+        const rules = {
+            consumer_mobile: [{
+                required: true,
+                message: '客户电话不能为空'
+            }],
+            consumer_name: [{
+                required: true,
+                message: '客户姓名不能为空'
+            }],
+            except_arrive_time: [{
+                required: true,
+                message: '预期到访时间不能为空'
+            }]
+        }
+
+        function onFinish () {
+            return formRef.value.validateFields().then((values) => {
+                if (props.onFinish) {
+                    return props.onFinish(values)
+                } else {
+                    return Promise.reject(new Error('finish no'))
+                }
+            })
+        }
+
+        function onNumberInput (key) {
+            return function (evt) {
+                formData[key] = evt.target.value.replace(/[^\d]/g, '')
+            }
+        }
+
+        function show () {
+            formRef.value && formRef.value.resetFields()
+            visible.value = true
+        }
+
+        expose({
+            show
+        })
+
+        return () => {
+            const defaultFormItemConfig = {
+                labelCol: {
+                    style: 'flex: 0 0 120px'
+                },
+                wrapperCol: {
+                    style: 'max-width: calc(100% - 120px)'
+                }
+            }
+            return (
+                <Modal v-model:visible={ visible.value } maskClosable={ false } title="报单登记" onOk={ onFinish }>
+                    <Form ref={ formRef } model={ formData } rules={ rules }>
+                        <FormItem label="客户电话" name="consumer_mobile" { ...defaultFormItemConfig }>
+                            <Input placeholder="请输入" v-model:value={ formData.consumer_mobile }
+                                   onChange={ onNumberInput('consumer_mobile') }/>
+                        </FormItem>
+                        <FormItem label="客户姓名" name="consumer_name" { ...defaultFormItemConfig }>
+                            <Input placeholder="请输入" v-model:value={ formData.consumer_name }/>
+                        </FormItem>
+                        <FormItem label="预期到访时间" name="except_arrive_time" { ...defaultFormItemConfig }>
+                            <DatePicker showTime={ true } v-model:value={ formData.except_arrive_time }/>
+                        </FormItem>
+                    </Form>
+                </Modal>
+            )
+        }
+    }
+})
+
 export default defineComponent({
     setup () {
+        const modalFormRef = ref(null)
+
         const loading = ref(false)
-
         const dataSource = ref([])
-
         const pagination = reactive({
             showQuickJumper: false,
             showSizeChanger: false,
@@ -76,7 +162,6 @@ export default defineComponent({
                 return `共${ total }条`
             }
         })
-
         const formData = reactive({
             consumer_mobile: '', // 客户电话
             creat_time: null, // 报单开始时间 // 报单结束时间
@@ -146,9 +231,7 @@ export default defineComponent({
                         message.success({
                             content: '撤销成功'
                         })
-                        pagination.current = 1
-                        pagination.total = 0
-                        getDataSource()
+                        onFinish()
                     })
                     .catch((err) => {
                         message.error({
@@ -161,7 +244,7 @@ export default defineComponent({
             }
         }
 
-        function onFinish (values) {
+        function onFinish () {
             pagination.current = 1
             pagination.total = 0
             getDataSource()
@@ -170,6 +253,34 @@ export default defineComponent({
         function onChange (page) {
             pagination.current = page.current
             getDataSource()
+        }
+
+        function handleCreateRequest () {
+            modalFormRef.value && modalFormRef.value.show()
+        }
+
+        function onCreateReport (values) {
+            const data = {
+                consumer_mobile: values.consumer_mobile,
+                consumer_name: values.consumer_name,
+                expect_arrive_time: values.except_arrive_time ? values.except_arrive_time.unix() : 0
+            }
+            return new Promise((resolve, reject) => {
+                requestReportCreate(data)
+                    .then((res) => {
+                        message.success({
+                            content: '添加成功'
+                        })
+                        onFinish()
+                        resolve(res)
+                    })
+                    .catch((err) => {
+                        message.error({
+                            content: err.message
+                        })
+                        reject(err)
+                    })
+            })
         }
 
         return () => {
@@ -290,7 +401,7 @@ export default defineComponent({
                         <div class={ cx('table-list-toolbar') }>
                             <div class={ cx('table-list-toolbar-container') }>
                                 <div class={ cx('table-list-toolbar-title') }>报单列表</div>
-                                <Button type="primary">报单登记</Button>
+                                <Button type="primary" onClick={ handleCreateRequest }>报单登记</Button>
                             </div>
                         </div>
                         <Table
@@ -302,6 +413,7 @@ export default defineComponent({
                             v-slots={ tableSlots }
                         />
                     </Card>
+                    <ModalForm ref={ modalFormRef } onFinish={ onCreateReport }/>
                 </div>
             )
         }
