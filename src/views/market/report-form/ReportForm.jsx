@@ -63,10 +63,8 @@ const columns = [
 ]
 
 const ModalForm = defineComponent({
-    props: {
-        onFinish: Function
-    },
-    setup (props, { expose }) {
+    emits: ['finish'],
+    setup (props, { expose, emit }) {
         const formRef = ref(null)
 
         const visible = ref(false)
@@ -92,14 +90,33 @@ const ModalForm = defineComponent({
             }]
         }
 
-        function onFinish () {
-            return formRef.value.validateFields().then((values) => {
-                if (props.onFinish) {
-                    return props.onFinish(values)
-                } else {
-                    return Promise.reject(new Error('finish no'))
-                }
+        function onCreateReport (values) {
+            const data = {
+                consumer_mobile: values.consumer_mobile,
+                consumer_name: values.consumer_name,
+                expect_arrive_time: values.except_arrive_time ? values.except_arrive_time.unix() : 0
+            }
+            return new Promise((resolve, reject) => {
+                requestReportCreate(data)
+                    .then((res) => {
+                        message.success({
+                            content: '添加成功'
+                        })
+                        emit('finish')
+                        resolve(res)
+                    })
+                    .catch((err) => {
+                        message.error({
+                            content: err.message
+                        })
+                        reject(err)
+                    })
             })
+        }
+
+        async function onFinish () {
+            const values = await formRef.value.validateFields()
+            return onCreateReport(values)
         }
 
         function onNumberInput (key) {
@@ -259,30 +276,6 @@ export default defineComponent({
             modalFormRef.value && modalFormRef.value.show()
         }
 
-        function onCreateReport (values) {
-            const data = {
-                consumer_mobile: values.consumer_mobile,
-                consumer_name: values.consumer_name,
-                expect_arrive_time: values.except_arrive_time ? values.except_arrive_time.unix() : 0
-            }
-            return new Promise((resolve, reject) => {
-                requestReportCreate(data)
-                    .then((res) => {
-                        message.success({
-                            content: '添加成功'
-                        })
-                        onFinish()
-                        resolve(res)
-                    })
-                    .catch((err) => {
-                        message.error({
-                            content: err.message
-                        })
-                        reject(err)
-                    })
-            })
-        }
-
         return () => {
             const searchOptions = [
                 {
@@ -413,7 +406,7 @@ export default defineComponent({
                             v-slots={ tableSlots }
                         />
                     </Card>
-                    <ModalForm ref={ modalFormRef } onFinish={ onCreateReport }/>
+                    <ModalForm ref={ modalFormRef } onFinish={ onFinish }/>
                 </div>
             )
         }
