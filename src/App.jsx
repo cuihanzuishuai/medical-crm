@@ -1,4 +1,5 @@
 import { defineComponent } from 'vue'
+import { RouterView } from 'vue-router'
 import { ConfigProvider } from 'ant-design-vue'
 import dayjs from 'dayjs'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
@@ -11,7 +12,7 @@ export default defineComponent({
         return () => {
             return (
                 <ConfigProvider locale={ zhCN }>
-                    <router-view/>
+                    <RouterView/>
                 </ConfigProvider>
             )
         }

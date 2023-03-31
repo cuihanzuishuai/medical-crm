@@ -10,11 +10,15 @@
     padding: 0 18px;
     overflow-y: auto;
 
-    .content__view {
+    .view-container {
         position: relative;
-    }
 
-    .content__fill {
-        height: 18px;
+        .content__view {
+            position: relative;
+        }
+
+        .content__fill {
+            height: 18px;
+        }
     }
 }

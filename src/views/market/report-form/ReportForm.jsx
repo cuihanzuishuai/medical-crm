@@ -302,7 +302,7 @@ export default defineComponent({
                         return (
                             <RangePicker
                                 v-model:value={ formData.creat_time }
-                                getPopupContainer={ () => document.getElementById('contentView') }
+                                getPopupContainer={ () => document.getElementById('viewContainer') }
                             />
                         )
                     }
@@ -384,7 +384,7 @@ export default defineComponent({
                         <Popconfirm
                             title="确定要撤销?"
                             onConfirm={ onDelete(record) }
-                            getPopupContainer={ () => document.getElementById('contentView') }
+                            getPopupContainer={ () => document.getElementById('viewContainer') }
                         >
                             <a>撤销</a>
                         </Popconfirm>
@@ -415,7 +415,7 @@ export default defineComponent({
                                     <Button type="primary" onClick={ handleCreateRequest }>
                                         报单登记
                                     </Button>
-                                    <Tooltip getPopupContainer={ () => document.getElementById('contentView') }>
+                                    <Tooltip getPopupContainer={ () => document.getElementById('viewContainer') }>
                                         { {
                                             title: () => <span>上传报单</span>,
                                             default: () => (

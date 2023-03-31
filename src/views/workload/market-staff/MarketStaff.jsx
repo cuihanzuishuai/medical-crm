@@ -133,9 +133,9 @@ export default defineComponent({
                         onFinish={ onFinish }
                     />
                     <Card bodyStyle={ { paddingTop: '0' } }>
-                        <div className={ cx('table-list-toolbar') }>
-                            <div className={ cx('table-list-toolbar-container') }>
-                                <div className={ cx('table-list-toolbar-title') }>工作量列表</div>
+                        <div class={ cx('table-list-toolbar') }>
+                            <div class={ cx('table-list-toolbar-container') }>
+                                <div class={ cx('table-list-toolbar-title') }>工作量列表</div>
                             </div>
                         </div>
                         <Table
