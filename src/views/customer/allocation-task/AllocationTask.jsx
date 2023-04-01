@@ -10,11 +10,10 @@ import {
     Select,
     Tag,
     Space,
-    Dropdown,
     Divider,
-    Menu
+    Button
 } from 'ant-design-vue'
-import { DownOutlined } from '@ant-design/icons-vue'
+import { PlusOutlined } from '@ant-design/icons-vue'
 import TableSearch from '@/components/table-search'
 import TableDrawer from './TableDrawer'
 import { requestCustomerServerList, requestCustomerServerResult } from '@/api/customer'
@@ -29,7 +28,6 @@ const cx = classNames.bind(styles)
 
 const FormItem = Form.Item
 const RangePicker = DatePicker.RangePicker
-const MenuItem = Menu.Item
 const TextArea = Input.TextArea
 
 const FinishedEnum = {
@@ -202,6 +200,10 @@ export default defineComponent({
 
         const loading = ref(false)
         const dataSource = ref([])
+        const rowSelection = reactive({
+            selectedRowKeys: [],
+            onChange: onSelectChange
+        })
         const pagination = reactive({
             showQuickJumper: false,
             showSizeChanger: false,
@@ -239,6 +241,10 @@ export default defineComponent({
             return '--'
         }
 
+        function onSelectChange (selectedRowKeys) {
+            rowSelection.selectedRowKeys = selectedRowKeys
+        }
+
         function getStartAndEndTime (times) {
             const [startTime, endTime] = times || []
             return {
@@ -267,7 +273,12 @@ export default defineComponent({
             loading.value = true
             requestCustomerServerList(data)
                 .then((res) => {
-                    dataSource.value = res.list
+                    dataSource.value = res.list.map((item) => {
+                        return {
+                            ...item,
+                            key: item.task_id
+                        }
+                    })
                     if (pagination.current === 1) {
                         pagination.total = res.page.total
                     }
@@ -282,38 +293,20 @@ export default defineComponent({
                 })
         }
 
-        function onDelete (record) {
-            return function () {
-                const data = {
-                    id: record.id
-                }
-                loading.value = true
-                requestReportRecover(data)
-                    .then(() => {
-                        message.success({
-                            content: '撤销成功'
-                        })
-                        onFinish()
-                    })
-                    .catch((err) => {
-                        message.error({
-                            content: err.message
-                        })
-                    })
-                    .finally(() => {
-                        loading.value = false
-                    })
-            }
+        function onServerDistribute (record) {
+            console.log(record)
         }
 
         function onFinish () {
             pagination.current = 1
             pagination.total = 0
+            rowSelection.selectedRowKeys = []
             getDataSource()
         }
 
         function onChange (page) {
             pagination.current = page.current
+            rowSelection.selectedRowKeys = []
             getDataSource()
         }
 
@@ -438,43 +431,6 @@ export default defineComponent({
                     )
                 },
                 action: (record) => {
-                    if (hasAccess([Role.Admin, Role.RoleCustomManager])) {
-                        const dropdownSlots = {
-                            default: () => {
-                                return (
-                                    <a class={ cx('action') }>
-                                        <Space size={ 2 } align="center">
-                                            <span>更多</span>
-                                            <DownOutlined style={ { fontSize: '12px' } }/>
-                                        </Space>
-                                    </a>
-                                )
-                            },
-                            overlay: () => {
-                                return (
-                                    <Menu>
-                                        <MenuItem key="回访">
-                                            <a class={ cx('action') } onClick={ onServerResult(record) }>回访</a>
-                                        </MenuItem>
-                                        <MenuItem key="回访历史">
-                                            <a class={ cx('action') } onClick={ onServerHistory(record) }>回访历史</a>
-                                        </MenuItem>
-                                    </Menu>
-                                )
-                            }
-                        }
-                        return (
-                            <Space size={ 0 }>
-                                <a class={ cx('action') }>分配任务</a>
-                                <Divider type="vertical"/>
-                                <Dropdown
-                                    placement="bottomRight"
-                                    v-slots={ dropdownSlots }
-                                    getPopupContainer={ () => document.getElementById('viewContainer') }
-                                />
-                            </Space>
-                        )
-                    }
                     return (
                         <Space size={ 0 }>
                             <a class={ cx('action') } onClick={ onServerResult(record) }>回访</a>
@@ -492,6 +448,8 @@ export default defineComponent({
                 }
             }
 
+            const hasPermission = hasAccess([Role.Admin, Role.RoleCustomManager])
+
             return (
                 <div class={ cx('view-wrap') }>
                     <TableSearch
@@ -504,6 +462,13 @@ export default defineComponent({
                         <div class={ cx('table-list-toolbar') }>
                             <div class={ cx('table-list-toolbar-container') }>
                                 <div class={ cx('table-list-toolbar-title') }>任务列表</div>
+                                {
+                                    hasPermission ? (
+                                        <Button type="primary" onClick={ onServerDistribute }>
+                                            <PlusOutlined/>分配任务
+                                        </Button>
+                                    ) : null
+                                }
                             </div>
                         </div>
                         <Table
@@ -511,6 +476,7 @@ export default defineComponent({
                             columns={ columns }
                             dataSource={ dataSource.value }
                             pagination={ pagination }
+                            rowSelection={ hasPermission ? rowSelection : false }
                             onChange={ onChange }
                             v-slots={ tableSlots }
                         />
