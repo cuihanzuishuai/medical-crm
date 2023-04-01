@@ -1,4 +1,5 @@
 import LayoutMain from '@/layout'
+import * as Role from '@/permission'
 
 /**
  * meta: {
@@ -24,7 +25,7 @@ const routes = [
         component: LayoutMain,
         redirect: { name: 'report-form' },
         meta: {
-            hideInMenu: true,
+            hideInMenu: true
         },
         children: [
             {
@@ -33,7 +34,7 @@ const routes = [
                 meta: {
                     title: '首页',
                     icon: 'icon-shouye',
-                    hideInMenu: true,
+                    hideInMenu: true
                 },
                 component: () => import('@/views/Home')
             }
@@ -52,7 +53,8 @@ const routes = [
                 path: 'report-form',
                 name: 'report-form',
                 meta: {
-                    title: '报单登记'
+                    title: '报单登记',
+                    icon: 'icon-shichang'
                 },
                 component: () => import('@/views/market/report-form')
             },
@@ -60,7 +62,8 @@ const routes = [
                 path: 'patient-info',
                 name: 'patient-info',
                 meta: {
-                    title: '患者信息'
+                    title: '患者信息',
+                    hideInMenu: true
                 },
                 component: () => import('@/views/market/patient-info')
             }
@@ -79,7 +82,8 @@ const routes = [
                 path: 'patient-revisit',
                 name: 'patient-revisit',
                 meta: {
-                    title: '待复诊患者'
+                    title: '待复诊患者',
+                    hideInMenu: true
                 },
                 component: () => import('@/views/customer/patient-revisit')
             },
@@ -114,7 +118,8 @@ const routes = [
                 path: 'market-staff',
                 name: 'market-staff',
                 meta: {
-                    title: '市场部工作量'
+                    title: '市场部工作量',
+                    access: [Role.Admin, Role.RoleMarketManager]
                 },
                 component: () => import('@/views/workload/market-staff')
             },
@@ -122,7 +127,8 @@ const routes = [
                 path: 'customer-staff',
                 name: 'customer-staff',
                 meta: {
-                    title: '客服部工作量'
+                    title: '客服部工作量',
+                    access: [Role.Admin, Role.RoleCustomManager]
                 },
                 component: () => import('@/views/workload/customer-staff')
             }
@@ -133,7 +139,8 @@ const routes = [
         name: 'finance',
         meta: {
             title: '财务管理',
-            icon: 'icon-caiwu'
+            icon: 'icon-caiwu',
+            hideInMenu: true
         },
         component: LayoutMain,
         children: [
@@ -160,7 +167,8 @@ const routes = [
         name: 'permission',
         meta: {
             title: '权限管理',
-            icon: 'icon-quanxian'
+            icon: 'icon-quanxian',
+            access: [Role.Admin]
         },
         component: LayoutMain,
         children: [

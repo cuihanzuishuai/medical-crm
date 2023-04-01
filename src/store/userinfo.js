@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { requestUserInfo } from '@/api/user'
+import { Admin } from '@/permission'
 
 const useUserinfo = defineStore('userinfo', {
     state: () => {
@@ -23,8 +24,12 @@ const useUserinfo = defineStore('userinfo', {
                     .then((res) => {
                         this.$patch((state) => {
                             state.hasGetInfo = true
-                            state.access = [parseInt(res.role)]
                             state.isAdmin = res.is_admin
+                            if (res.is_admin) {
+                                state.access = [Admin]
+                            } else {
+                                state.access = [String(res.role)]
+                            }
                             state.status = res.status
                             state.name = res.name
                             resolve(state.access)
