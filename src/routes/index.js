@@ -53,8 +53,7 @@ const routes = [
                 path: 'report-form',
                 name: 'report-form',
                 meta: {
-                    title: '报单登记',
-                    icon: 'icon-shichang'
+                    title: '报单登记'
                 },
                 component: () => import('@/views/market/report-form')
             },
@@ -179,8 +178,7 @@ const routes = [
                 path: 'staff-management',
                 name: 'staff-management',
                 meta: {
-                    title: '员工管理',
-                    icon: 'icon-quanxian'
+                    title: '员工管理'
                 },
                 component: () => import('@/views/permission/staff-management')
             },

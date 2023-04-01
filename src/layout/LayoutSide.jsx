@@ -14,7 +14,8 @@ const cx = classNames.bind(styles)
 function createMenuItem (item) {
     if (item.children && item.children.length === 1) {
         const menuItemSlots = {
-            icon: item.children[0].icon ? () => <Icon type={ item.children[0].icon }/> : undefined,
+            // icon: item.children[0].icon ? () => <Icon type={ item.children[0].icon }/> : undefined,
+            icon: (item.children[0].icon || item.icon) ? () => <Icon type={ item.children[0].icon || item.icon }/> : undefined,
             default: () => <span>{ item.children[0].meta.title }</span>
         }
         return <MenuItem key={ item.children[0].name } v-slots={ menuItemSlots }/>
