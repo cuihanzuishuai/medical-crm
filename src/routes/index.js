@@ -91,7 +91,8 @@ const routes = [
                 path: 'allocation-task',
                 name: 'allocation-task',
                 meta: {
-                    title: '任务分配'
+                    title: '任务分配',
+                    icon: 'icon-kefu'
                 },
                 component: () => import('@/views/customer/allocation-task')
             },
@@ -99,7 +100,8 @@ const routes = [
                 path: 'visit-record',
                 name: 'visit-record',
                 meta: {
-                    title: '回访记录'
+                    title: '回访记录',
+                    hideInMenu: true
                 },
                 component: () => import('@/views/customer/visit-record')
             }
@@ -176,7 +178,8 @@ const routes = [
                 path: 'staff-management',
                 name: 'staff-management',
                 meta: {
-                    title: '员工管理'
+                    title: '员工管理',
+                    icon: 'icon-quanxian'
                 },
                 component: () => import('@/views/permission/staff-management')
             },
@@ -184,7 +187,8 @@ const routes = [
                 path: 'allocation-role',
                 name: 'allocation-role',
                 meta: {
-                    title: '角色分配'
+                    title: '角色分配',
+                    hideInMenu: true
                 },
                 component: () => import('@/views/permission/allocation-role')
             }

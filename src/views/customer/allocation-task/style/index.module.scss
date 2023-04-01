@@ -1,0 +1,32 @@
+.view-wrap {
+    position: relative;
+}
+
+.table-list-toolbar {
+    overflow-x: auto;
+    line-height: 1;
+
+    .table-list-toolbar-container {
+        @include flex(null, space-between);
+        padding: 16px 0;
+
+        .table-list-toolbar-title {
+            @include flex(center, flex-start);
+            @include text(16px, $text, null, null, 500);
+        }
+
+        .upload {
+            width: 32px;
+            @include text(18px, $icon);
+            cursor: pointer;
+
+            &:hover {
+                color: $primary;
+            }
+        }
+    }
+}
+
+.action {
+    color: $primary;
+}

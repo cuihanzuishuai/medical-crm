@@ -11,7 +11,9 @@ import {
     Modal,
     Form,
     Space,
-    Tooltip
+    Select,
+    Tooltip,
+    Tag
 } from 'ant-design-vue'
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import TableSearch from '@/components/table-search'
@@ -25,6 +27,19 @@ const cx = classNames.bind(styles)
 
 const FormItem = Form.Item
 const RangePicker = DatePicker.RangePicker
+
+const MatchEnum = {
+    1: {
+        value: 1,
+        label: '是',
+        color: 'blue'
+    },
+    2: {
+        value: 2,
+        label: '否',
+        color: 'red'
+    }
+}
 
 const columns = [
     {
@@ -141,7 +156,7 @@ const ModalForm = defineComponent({
 
         function onNumberInput (key) {
             return function (evt) {
-                formData[key] = evt.target.value.replace(/[^\d]/g, '')
+                formData[key] = evt.target.value.replace(/[^\d-]/g, '')
             }
         }
 
@@ -213,14 +228,14 @@ export default defineComponent({
             creat_time: null, // 报单开始时间 // 报单结束时间
             user_id: '',  // 员工id
             user_name: '', // 员工姓名
-            is_match: false // 是否匹配
+            is_match: undefined // 是否匹配
         })
 
         getDataSource()
 
         function onNumberInput (key) {
             return function (evt) {
-                formData[key] = evt.target.value.replace(/[^\d]/g, '')
+                formData[key] = evt.target.value.replace(/[^\d-]/g, '')
             }
         }
 
@@ -250,7 +265,7 @@ export default defineComponent({
                 creat_end_time: time.endTime, // 报单结束时间
                 user_id: formData.user_id ? parseInt(formData.user_id) : 0,  // 员工id
                 user_name: formData.user_name, // 员工姓名
-                is_match: formData.is_match ? 1 : 0, // 是否匹配
+                is_match: formData.is_match || 0, // 是否匹配
                 page: {
                     current_page: pagination.current,
                     page_size: pagination.pageSize
@@ -370,8 +385,16 @@ export default defineComponent({
                     label: '是否匹配',
                     name: 'is_match',
                     render () {
+                        const options = Object.keys(MatchEnum).map((key) => {
+                            return MatchEnum[key]
+                        })
                         return (
-                            <Checkbox v-model:checked={ formData.is_match }/>
+                            <Select
+                                placeholder="请选择"
+                                v-model:value={ formData.is_match }
+                                options={ options }
+                                getPopupContainer={ () => document.getElementById('viewContainer') }
+                            />
                         )
                     }
                 }
@@ -394,23 +417,31 @@ export default defineComponent({
                     )
                 },
                 consumer_amount: (record) => {
-                    return (
-                        <span>{ formatCurrency(record.consumer_amount / 100) }</span>
-                    )
+                    if (record.is_match) {
+                        return (
+                            <span>{ formatCurrency(record.consumer_amount / 100) }</span>
+                        )
+                    }
+                    return <span>--</span>
                 },
                 is_match: (record) => {
-                    return (
-                        <span>{ record.is_match ? '是' : '否' }</span>
-                    )
+                    const data = MatchEnum[record.is_match] || (record.is_match ? MatchEnum['1'] : MatchEnum['2'])
+                    if (data) {
+                        return (
+                            <Tag color={ data.color }>{ data.label }</Tag>
+                        )
+                    }
+                    return <span>--</span>
                 },
                 action: (record) => {
                     return (
                         <Popconfirm
                             title="确定要撤销?"
+                            placement="topRight"
                             onConfirm={ onDelete(record) }
                             getPopupContainer={ () => document.getElementById('viewContainer') }
                         >
-                            <a>撤销</a>
+                            <a class={ cx('action') }>撤销</a>
                         </Popconfirm>
                     )
                 }

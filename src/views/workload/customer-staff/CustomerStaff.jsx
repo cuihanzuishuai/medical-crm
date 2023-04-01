@@ -58,7 +58,7 @@ export default defineComponent({
 
         function onNumberInput (key) {
             return function (evt) {
-                formData[key] = evt.target.value.replace(/[^\d]/g, '')
+                formData[key] = evt.target.value.replace(/[^\d-]/g, '')
             }
         }
 

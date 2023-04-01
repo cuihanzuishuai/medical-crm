@@ -9,7 +9,8 @@ import {
     Modal,
     Form,
     Space,
-    Select
+    Select,
+    Tag
 } from 'ant-design-vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import TableSearch from '@/components/table-search'
@@ -21,6 +22,19 @@ import styles from './style/index.module.scss'
 const cx = classNames.bind(styles)
 
 const FormItem = Form.Item
+
+const StatusEnum = {
+    1: {
+        value: 1,
+        label: '正常',
+        color: 'blue'
+    },
+    2: {
+        value: 2,
+        label: '离职',
+        color: 'red'
+    }
+}
 
 const columns = [
     {
@@ -47,6 +61,12 @@ const columns = [
         title: '在职状态',
         dataIndex: 'status',
         key: 'status'
+    },
+    {
+        title: '操作',
+        dataIndex: 'action',
+        key: 'action',
+        width: '100px'
     }
 ]
 
@@ -118,7 +138,7 @@ const ModalForm = defineComponent({
 
         function onNumberInput (key) {
             return function (evt) {
-                formData[key] = evt.target.value.replace(/[^\d]/g, '')
+                formData[key] = evt.target.value.replace(/[^\d--]/g, '')
             }
         }
 
@@ -206,7 +226,7 @@ export default defineComponent({
 
         function onNumberInput (key) {
             return function (evt) {
-                formData[key] = evt.target.value.replace(/[^\d]/g, '')
+                formData[key] = evt.target.value.replace(/[^\d-]/g, '')
             }
         }
 
@@ -328,20 +348,30 @@ export default defineComponent({
                     )
                 },
                 status: (record) => {
-                    if (parseInt(record.status) === 1) {
+                    const data = StatusEnum[record.status]
+                    if (data) {
                         return (
-                            <Popconfirm
-                                title="确定修改为离职?"
-                                onConfirm={ onUserChangeStatus(record) }
-                                getPopupContainer={ () => document.getElementById('viewContainer') }
-                            >
-                                <a>正常</a>
-                            </Popconfirm>
+                            <Tag color={ data.color }>{ data.label }</Tag>
                         )
                     }
                     return (
-                        <span>离职</span>
+                        <span>--</span>
                     )
+                },
+                action: (record) => {
+                    if (parseInt(record.status) === 1) {
+                        return (
+                            <Popconfirm
+                                title="确定员工离职?"
+                                placement="topRight"
+                                onConfirm={ onUserChangeStatus(record) }
+                                getPopupContainer={ () => document.getElementById('viewContainer') }
+                            >
+                                <a class={ cx('action') }>确认离职</a>
+                            </Popconfirm>
+                        )
+                    }
+                    return <span>--</span>
                 }
             }
 
