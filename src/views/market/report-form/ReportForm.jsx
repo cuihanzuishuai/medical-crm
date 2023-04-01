@@ -225,7 +225,13 @@ export default defineComponent({
         }
 
         function formatTime (value) {
-            return dayjs.unix(value).format('YYYY-MM-DD HH:mm')
+            const timeStr = String(value)
+            if ((timeStr.length === 13)) {
+                return dayjs(value).format('YYYY-MM-DD HH:mm')
+            } else if (timeStr.length === 10) {
+                return dayjs.unix(value).format('YYYY-MM-DD HH:mm')
+            }
+            return '--'
         }
 
         function getStartAndEndTime (times) {
