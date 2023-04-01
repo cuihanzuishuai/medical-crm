@@ -5,16 +5,22 @@ import {
     Input,
     DatePicker,
     message,
-    Popconfirm,
     Modal,
     Form,
     Select,
-    Tag
+    Tag,
+    Space,
+    Dropdown,
+    Divider,
+    Menu
 } from 'ant-design-vue'
+import { DownOutlined } from '@ant-design/icons-vue'
 import TableSearch from '@/components/table-search'
-import { requestCustomerServerList } from '@/api/customer'
+import { requestCustomerServerList, requestCustomerServerResult } from '@/api/customer'
 import { formatCurrency } from '@/util/format'
 import dayjs from 'dayjs'
+import * as Role from '@/permission'
+import hasAccess from '@/permission/hasAccess'
 import classNames from '@/common/classNamesBind'
 import styles from './style/index.module.scss'
 
@@ -22,6 +28,8 @@ const cx = classNames.bind(styles)
 
 const FormItem = Form.Item
 const RangePicker = DatePicker.RangePicker
+const MenuItem = Menu.Item
+const TextArea = Input.TextArea
 
 const FinishedEnum = {
     1: {
@@ -76,7 +84,7 @@ const columns = [
         title: '操作',
         dataIndex: 'action',
         key: 'action',
-        width: '80px'
+        width: '160px'
     }
 ]
 
@@ -88,35 +96,32 @@ const ModalForm = defineComponent({
         const visible = ref(false)
         const loading = ref(false)
 
+        let recordData = null
+
         const formData = reactive({
-            consumer_mobile: '',
-            consumer_name: '',
-            except_arrive_time: null
+            is_finished: undefined,
+            desc: ''
         })
 
         const rules = {
-            consumer_mobile: [{
+            desc: [{
                 required: true,
-                message: '客户电话不能为空'
+                message: '备注不能为空'
             }],
-            consumer_name: [{
+            is_finished: [{
                 required: true,
-                message: '客户姓名不能为空'
-            }],
-            except_arrive_time: [{
-                required: true,
-                message: '预期到访时间不能为空'
+                message: '是否完成不能为空'
             }]
         }
 
-        function onCreateReport (values) {
+        function onCustomerServerResult (values) {
             const data = {
-                consumer_mobile: values.consumer_mobile,
-                consumer_name: values.consumer_name,
-                expect_arrive_time: values.except_arrive_time ? values.except_arrive_time.unix() : 0
+                task_id: recordData.task_id,
+                desc: values.desc,
+                is_finished: values.is_finished
             }
             loading.value = true
-            requestReportCreate(data)
+            requestCustomerServerResult(data)
                 .then((res) => {
                     message.success({
                         content: '添加成功'
@@ -136,16 +141,11 @@ const ModalForm = defineComponent({
 
         async function onFinish () {
             const values = await formRef.value.validateFields()
-            onCreateReport(values)
+            onCustomerServerResult(values)
         }
 
-        function onNumberInput (key) {
-            return function (evt) {
-                formData[key] = evt.target.value.replace(/[^\d-]/g, '')
-            }
-        }
-
-        function show () {
+        function show (record) {
+            recordData = record
             formRef.value && formRef.value.resetFields()
             visible.value = true
         }
@@ -155,6 +155,10 @@ const ModalForm = defineComponent({
         })
 
         return () => {
+            const options = Object.keys(FinishedEnum).map((key) => {
+                return FinishedEnum[key]
+            })
+
             const defaultFormItemConfig = {
                 labelCol: {
                     style: 'flex: 0 0 120px'
@@ -172,18 +176,15 @@ const ModalForm = defineComponent({
                     maskClosable={ false }
                 >
                     <Form ref={ formRef } model={ formData } rules={ rules } validateTrigger={ ['blur'] }>
-                        <FormItem label="客户姓名" name="consumer_name" { ...defaultFormItemConfig }>
-                            <Input placeholder="请输入" v-model:value={ formData.consumer_name }/>
-                        </FormItem>
-                        <FormItem label="客户电话" name="consumer_mobile" { ...defaultFormItemConfig }>
-                            <Input
-                                placeholder="请输入"
-                                v-model:value={ formData.consumer_mobile }
-                                onChange={ onNumberInput('consumer_mobile') }
+                        <FormItem label="是否完成" name="is_finished" { ...defaultFormItemConfig }>
+                            <Select
+                                placeholder="请选择"
+                                v-model:value={ formData.is_finished }
+                                options={ options }
                             />
                         </FormItem>
-                        <FormItem label="预期到访时间" name="except_arrive_time" { ...defaultFormItemConfig }>
-                            <DatePicker showTime={ true } v-model:value={ formData.except_arrive_time }/>
+                        <FormItem label="备注" name="desc" { ...defaultFormItemConfig }>
+                            <TextArea placeholder="请输入" v-model:value={ formData.desc } autosize={ { minRows: 4, maxRows: 4 } }/>
                         </FormItem>
                     </Form>
                 </Modal>
@@ -313,8 +314,10 @@ export default defineComponent({
             getDataSource()
         }
 
-        function handleCreateRequest () {
-            modalFormRef.value && modalFormRef.value.show()
+        function onServerResult (record) {
+            return function () {
+                modalFormRef.value && modalFormRef.value.show(record)
+            }
         }
 
         return () => {
@@ -426,14 +429,49 @@ export default defineComponent({
                     )
                 },
                 action: (record) => {
+                    if (hasAccess([Role.Admin, Role.RoleCustomManager])) {
+                        const dropdownSlots = {
+                            default: () => {
+                                return (
+                                    <a class={ cx('action') }>
+                                        <Space size={ 2 } align="center">
+                                            <span>更多</span>
+                                            <DownOutlined style={ { fontSize: '12px' } }/>
+                                        </Space>
+                                    </a>
+                                )
+                            },
+                            overlay: () => {
+                                return (
+                                    <Menu>
+                                        <MenuItem>
+                                            <a class={ cx('action') } onClick={ onServerResult(record) }>回访</a>
+                                        </MenuItem>
+                                        <MenuItem>
+                                            <a class={ cx('action') }>回访历史</a>
+                                        </MenuItem>
+                                    </Menu>
+                                )
+                            }
+                        }
+                        return (
+                            <Space size={ 0 }>
+                                <a class={ cx('action') }>分配任务</a>
+                                <Divider type="vertical"/>
+                                <Dropdown
+                                    placement="bottomRight"
+                                    v-slots={ dropdownSlots }
+                                    getPopupContainer={ () => document.getElementById('viewContainer') }
+                                />
+                            </Space>
+                        )
+                    }
                     return (
-                        <Popconfirm
-                            title="确定要撤销?"
-                            onConfirm={ onDelete(record) }
-                            getPopupContainer={ () => document.getElementById('viewContainer') }
-                        >
-                            <a class={ cx('action') }>撤销</a>
-                        </Popconfirm>
+                        <Space size={ 0 }>
+                            <a class={ cx('action') } onClick={ onServerResult(record) }>回访</a>
+                            <Divider type="vertical"/>
+                            <a class={ cx('action') }>回访历史</a>
+                        </Space>
                     )
                 }
             }

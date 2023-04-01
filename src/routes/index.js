@@ -112,7 +112,8 @@ const routes = [
         name: 'workload',
         meta: {
             title: '工作量',
-            icon: 'icon-gongzuoliang'
+            icon: 'icon-gongzuoliang',
+            access: [Role.Admin, Role.RoleMarketManager, Role.RoleCustomManager]
         },
         component: LayoutMain,
         children: [
