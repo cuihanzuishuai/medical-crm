@@ -13,7 +13,7 @@ import {
     Space,
     Tooltip
 } from 'ant-design-vue'
-import { UploadOutlined } from '@ant-design/icons-vue'
+import { UploadOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import TableSearch from '@/components/table-search'
 import { requestReportList, requestReportRecover, requestReportCreate } from '@/api/report'
 import { formatCurrency } from '@/util/format'
@@ -28,7 +28,7 @@ const RangePicker = DatePicker.RangePicker
 
 const columns = [
     {
-        title: '客户名称',
+        title: '客户姓名',
         dataIndex: 'consumer_name',
         key: 'consumer_name'
     },
@@ -38,12 +38,12 @@ const columns = [
         key: 'consumer_mobile'
     },
     {
-        title: '预期到达时间',
+        title: '预期到访时间',
         dataIndex: 'except_arrive_time',
         key: 'except_arrive_time'
     },
     {
-        title: '客户到达时间',
+        title: '到访时间',
         dataIndex: 'actual_arrive_time',
         key: 'actual_arrive_time'
     },
@@ -51,6 +51,11 @@ const columns = [
         title: '员工名称',
         dataIndex: 'user_name',
         key: 'user_name'
+    },
+    {
+        title: '员工ID',
+        dataIndex: 'user_id',
+        key: 'user_id'
     },
     {
         title: '创建时间',
@@ -109,27 +114,28 @@ const ModalForm = defineComponent({
                 consumer_name: values.consumer_name,
                 expect_arrive_time: values.except_arrive_time ? values.except_arrive_time.unix() : 0
             }
-            return new Promise((resolve, reject) => {
-                requestReportCreate(data)
-                    .then((res) => {
-                        message.success({
-                            content: '添加成功'
-                        })
-                        emit('finish')
-                        resolve(res)
+            loading.value = true
+            requestReportCreate(data)
+                .then((res) => {
+                    message.success({
+                        content: '添加成功'
                     })
-                    .catch((err) => {
-                        message.error({
-                            content: err.message
-                        })
-                        reject(err)
+                    emit('finish')
+                    visible.value = false
+                })
+                .catch((err) => {
+                    message.error({
+                        content: err.message
                     })
-            })
+                })
+                .finally(() => {
+                    loading.value = false
+                })
         }
 
         async function onFinish () {
             const values = await formRef.value.validateFields()
-            return onCreateReport(values)
+            onCreateReport(values)
         }
 
         function onNumberInput (key) {
@@ -157,14 +163,23 @@ const ModalForm = defineComponent({
                 }
             }
             return (
-                <Modal v-model:visible={ visible.value } maskClosable={ false } title="报单登记" onOk={ onFinish }>
-                    <Form ref={ formRef } model={ formData } rules={ rules }>
-                        <FormItem label="客户电话" name="consumer_mobile" { ...defaultFormItemConfig }>
-                            <Input placeholder="请输入" v-model:value={ formData.consumer_mobile }
-                                   onChange={ onNumberInput('consumer_mobile') }/>
-                        </FormItem>
+                <Modal
+                    title="报单登记"
+                    v-model:visible={ visible.value }
+                    confirmLoading={ loading.value }
+                    onOk={ onFinish }
+                    maskClosable={ false }
+                >
+                    <Form ref={ formRef } model={ formData } rules={ rules } validateTrigger={ ['blur'] }>
                         <FormItem label="客户姓名" name="consumer_name" { ...defaultFormItemConfig }>
                             <Input placeholder="请输入" v-model:value={ formData.consumer_name }/>
+                        </FormItem>
+                        <FormItem label="客户电话" name="consumer_mobile" { ...defaultFormItemConfig }>
+                            <Input
+                                placeholder="请输入"
+                                v-model:value={ formData.consumer_mobile }
+                                onChange={ onNumberInput('consumer_mobile') }
+                            />
                         </FormItem>
                         <FormItem label="预期到访时间" name="except_arrive_time" { ...defaultFormItemConfig }>
                             <DatePicker showTime={ true } v-model:value={ formData.except_arrive_time }/>
@@ -209,7 +224,7 @@ export default defineComponent({
         }
 
         function formatTime (value) {
-            return dayjs.unix(value).format('YYYY-MM-DD HH:mm:ss')
+            return dayjs.unix(value).format('YYYY-MM-DD HH:mm')
         }
 
         function getStartAndEndTime (times) {
@@ -330,7 +345,7 @@ export default defineComponent({
                     }
                 },
                 {
-                    label: '员工id',
+                    label: '员工ID',
                     name: 'user_id',
                     render () {
                         return (
@@ -413,7 +428,7 @@ export default defineComponent({
                                 <div class={ cx('table-list-toolbar-title') }>报单列表</div>
                                 <Space size={ 12 }>
                                     <Button type="primary" onClick={ handleCreateRequest }>
-                                        报单登记
+                                        <PlusOutlined/>报单登记
                                     </Button>
                                     <Tooltip getPopupContainer={ () => document.getElementById('viewContainer') }>
                                         { {

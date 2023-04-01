@@ -52,7 +52,7 @@ const routes = [
                 path: 'report-form',
                 name: 'report-form',
                 meta: {
-                    title: '报单功能'
+                    title: '报单登记'
                 },
                 component: () => import('@/views/market/report-form')
             },
@@ -70,7 +70,7 @@ const routes = [
         path: '/customer',
         name: 'customer',
         meta: {
-            title: '客服模块',
+            title: '客服',
             icon: 'icon-kefu'
         },
         component: LayoutMain,
@@ -132,7 +132,7 @@ const routes = [
         path: '/finance',
         name: 'finance',
         meta: {
-            title: '财务模块',
+            title: '财务管理',
             icon: 'icon-caiwu'
         },
         component: LayoutMain,
@@ -159,7 +159,7 @@ const routes = [
         path: '/permission',
         name: 'permission',
         meta: {
-            title: '权限模块',
+            title: '权限管理',
             icon: 'icon-quanxian'
         },
         component: LayoutMain,

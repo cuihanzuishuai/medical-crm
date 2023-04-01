@@ -4,19 +4,17 @@ import {
     Table,
     Button,
     Input,
-    DatePicker,
-    Checkbox,
     message,
     Popconfirm,
     Modal,
     Form,
     Space,
-    Tooltip
+    Select
 } from 'ant-design-vue'
-import { UploadOutlined } from '@ant-design/icons-vue'
+import { PlusOutlined } from '@ant-design/icons-vue'
 import TableSearch from '@/components/table-search'
-import { requestReportList, requestReportRecover, requestReportCreate } from '@/api/report'
-import { formatCurrency } from '@/util/format'
+import { requestUserList, requestUserCreate } from '@/api/user'
+import { RolesName } from '@/permission'
 import dayjs from 'dayjs'
 import classNames from '@/common/classNamesBind'
 import styles from './style/index.module.scss'
@@ -24,48 +22,32 @@ import styles from './style/index.module.scss'
 const cx = classNames.bind(styles)
 
 const FormItem = Form.Item
-const RangePicker = DatePicker.RangePicker
 
 const columns = [
     {
-        title: '客户名称',
-        dataIndex: 'consumer_name',
-        key: 'consumer_name'
+        title: '员工ID',
+        dataIndex: 'user_id',
+        key: 'user_id'
     },
     {
-        title: '客户电话',
-        dataIndex: 'consumer_mobile',
-        key: 'consumer_mobile'
+        title: '员工姓名',
+        dataIndex: 'name',
+        key: 'name'
     },
     {
-        title: '预期到达时间',
-        dataIndex: 'except_arrive_time',
-        key: 'except_arrive_time'
+        title: '员工电话',
+        dataIndex: 'mobile',
+        key: 'mobile'
     },
     {
-        title: '客户到达时间',
-        dataIndex: 'actual_arrive_time',
-        key: 'actual_arrive_time'
+        title: '角色权限',
+        dataIndex: 'role',
+        key: 'role'
     },
     {
-        title: '员工名称',
-        dataIndex: 'user_name',
-        key: 'user_name'
-    },
-    {
-        title: '创建时间',
-        dataIndex: 'create_time',
-        key: 'create_time'
-    },
-    {
-        title: '是否匹配',
-        dataIndex: 'is_match',
-        key: 'is_match'
-    },
-    {
-        title: '消费金额',
-        dataIndex: 'consumer_amount',
-        key: 'consumer_amount'
+        title: '在职状态',
+        dataIndex: 'status',
+        key: 'status'
     },
     {
         title: '操作',
@@ -81,55 +63,64 @@ const ModalForm = defineComponent({
         const formRef = ref(null)
 
         const visible = ref(false)
+        const loading = ref(false)
+
+        const options = Object.keys(RolesName).map((key) => {
+            return {
+                value: key,
+                label: RolesName[key]
+            }
+        })
 
         const formData = reactive({
-            consumer_mobile: '',
-            consumer_name: '',
-            except_arrive_time: null
+            name: '',
+            mobile: '',
+            role: undefined
         })
 
         const rules = {
-            consumer_mobile: [{
+            name: [{
                 required: true,
-                message: '客户电话不能为空'
+                message: '员工姓名不能为空'
             }],
-            consumer_name: [{
+            mobile: [{
                 required: true,
-                message: '客户姓名不能为空'
+                message: '员工电话不能为空'
             }],
-            except_arrive_time: [{
+            role: [{
                 required: true,
-                message: '预期到访时间不能为空'
+                message: '角色权限不能为空'
             }]
         }
 
-        function onCreateReport (values) {
+        function onCreateUser (values) {
             const data = {
-                consumer_mobile: values.consumer_mobile,
-                consumer_name: values.consumer_name,
-                expect_arrive_time: values.except_arrive_time ? values.except_arrive_time.unix() : 0
+                name: values.name,
+                mobile: values.mobile,
+                role: values.role
             }
-            return new Promise((resolve, reject) => {
-                requestReportCreate(data)
-                    .then((res) => {
-                        message.success({
-                            content: '添加成功'
-                        })
-                        emit('finish')
-                        resolve(res)
+            loading.value = true
+            requestUserCreate(data)
+                .then((res) => {
+                    message.success({
+                        content: '添加成功'
                     })
-                    .catch((err) => {
-                        message.error({
-                            content: err.message
-                        })
-                        reject(err)
+                    emit('finish')
+                    visible.value = false
+                })
+                .catch((err) => {
+                    message.error({
+                        content: err.message
                     })
-            })
+                })
+                .finally(() => {
+                    loading.value = false
+                })
         }
 
         async function onFinish () {
             const values = await formRef.value.validateFields()
-            return onCreateReport(values)
+            onCreateUser(values)
         }
 
         function onNumberInput (key) {
@@ -157,17 +148,31 @@ const ModalForm = defineComponent({
                 }
             }
             return (
-                <Modal v-model:visible={ visible.value } maskClosable={ false } title="报单登记" onOk={ onFinish }>
-                    <Form ref={ formRef } model={ formData } rules={ rules }>
-                        <FormItem label="客户电话" name="consumer_mobile" { ...defaultFormItemConfig }>
-                            <Input placeholder="请输入" v-model:value={ formData.consumer_mobile }
-                                   onChange={ onNumberInput('consumer_mobile') }/>
+                <Modal
+                    title="添加员工"
+                    v-model:visible={ visible.value }
+                    confirmLoading={ loading.value }
+                    onOk={ onFinish }
+                    maskClosable={ false }
+                >
+                    <Form ref={ formRef } model={ formData } rules={ rules } validateTrigger={ ['blur'] }>
+                        <FormItem label="员工姓名" name="name" { ...defaultFormItemConfig }>
+                            <Input placeholder="请输入" v-model:value={ formData.name }/>
                         </FormItem>
-                        <FormItem label="客户姓名" name="consumer_name" { ...defaultFormItemConfig }>
-                            <Input placeholder="请输入" v-model:value={ formData.consumer_name }/>
+                        <FormItem label="员工电话" name="mobile" { ...defaultFormItemConfig }>
+                            <Input
+                                placeholder="请输入"
+                                v-model:value={ formData.mobile }
+                                onChange={ onNumberInput('mobile') }
+                            />
                         </FormItem>
-                        <FormItem label="预期到访时间" name="except_arrive_time" { ...defaultFormItemConfig }>
-                            <DatePicker showTime={ true } v-model:value={ formData.except_arrive_time }/>
+                        <FormItem label="角色权限" name="role" { ...defaultFormItemConfig }>
+                            <Select
+                                placeholder="请选择"
+                                v-model:value={ formData.role }
+                                options={ options }
+                                allowClear={ true }
+                            />
                         </FormItem>
                     </Form>
                 </Modal>
@@ -179,8 +184,14 @@ const ModalForm = defineComponent({
 export default defineComponent({
     setup () {
         const modalFormRef = ref(null)
-
         const loading = ref(false)
+        const options = Object.keys(RolesName).map((key) => {
+            return {
+                value: key,
+                label: RolesName[key]
+            }
+        })
+
         const dataSource = ref([])
         const pagination = reactive({
             showQuickJumper: false,
@@ -193,11 +204,9 @@ export default defineComponent({
             }
         })
         const formData = reactive({
-            consumer_mobile: '', // 客户电话
-            creat_time: null, // 报单开始时间 // 报单结束时间
-            user_id: '',  // 员工id
-            user_name: '', // 员工姓名
-            is_match: false // 是否匹配
+            name: '', // 用户姓名
+            mobile: '',  // 员工手机号
+            role: undefined // 角色权限
         })
 
         getDataSource()
@@ -209,33 +218,21 @@ export default defineComponent({
         }
 
         function formatTime (value) {
-            return dayjs.unix(value).format('YYYY-MM-DD HH:mm:ss')
-        }
-
-        function getStartAndEndTime (times) {
-            const [startTime, endTime] = times || []
-            return {
-                startTime: startTime ? startTime.startOf('day').unix() : 0,
-                endTime: endTime ? endTime.endOf('day').unix() : 0
-            }
+            return dayjs.unix(value).format('YYYY-MM-DD HH:mm')
         }
 
         function getDataSource () {
-            const time = getStartAndEndTime(formData.creat_time)
             const data = {
-                consumer_mobile: formData.consumer_mobile,
-                create_start_time: time.startTime,// 报单开始时间
-                creat_end_time: time.endTime, // 报单结束时间
-                user_id: formData.user_id ? parseInt(formData.user_id) : 0,  // 员工id
-                user_name: formData.user_name, // 员工姓名
-                is_match: formData.is_match ? 1 : 0, // 是否匹配
+                name: formData.name,
+                mobile: formData.mobile,
+                role: formData.role,
                 page: {
                     current_page: pagination.current,
                     page_size: pagination.pageSize
                 }
             }
             loading.value = true
-            requestReportList(data)
+            requestUserList(data)
                 .then((res) => {
                     dataSource.value = res.list
                     pagination.total = res.page.total
@@ -251,27 +248,6 @@ export default defineComponent({
         }
 
         function onDelete (record) {
-            return function () {
-                const data = {
-                    id: record.id
-                }
-                loading.value = true
-                requestReportRecover(data)
-                    .then(() => {
-                        message.success({
-                            content: '撤销成功'
-                        })
-                        onFinish()
-                    })
-                    .catch((err) => {
-                        message.error({
-                            content: err.message
-                        })
-                    })
-                    .finally(() => {
-                        loading.value = false
-                    })
-            }
         }
 
         function onFinish () {
@@ -296,87 +272,55 @@ export default defineComponent({
         return () => {
             const searchOptions = [
                 {
-                    label: '报单时间',
-                    name: 'creat_time',
+                    label: '员工姓名',
+                    name: 'name',
                     render () {
                         return (
-                            <RangePicker
-                                v-model:value={ formData.creat_time }
+                            <Input
+                                placeholder="请输入"
+                                v-model:value={ formData.name }
+                            />
+                        )
+                    }
+                },
+                {
+                    label: '员工电话',
+                    name: 'mobile',
+                    render () {
+                        return (
+                            <Input
+                                placeholder="请输入"
+                                v-model:value={ formData.mobile }
+                            />
+                        )
+                    }
+                },
+                {
+                    label: '角色权限',
+                    name: 'role',
+                    render () {
+                        return (
+                            <Select
+                                placeholder="请选择"
+                                v-model:value={ formData.role }
+                                options={ options }
+                                allowClear={ true }
                                 getPopupContainer={ () => document.getElementById('viewContainer') }
                             />
-                        )
-                    }
-                },
-                {
-                    label: '客户电话',
-                    name: 'consumer_mobile',
-                    render () {
-                        return (
-                            <Input
-                                placeholder="请输入"
-                                v-model:value={ formData.consumer_mobile }
-                                onChange={ onNumberInput('consumer_mobile') }
-                            />
-                        )
-                    }
-                },
-                {
-                    label: '员工姓名',
-                    name: 'user_name',
-                    render () {
-                        return (
-                            <Input placeholder="请输入" v-model:value={ formData.user_name }/>
-                        )
-                    }
-                },
-                {
-                    label: '员工id',
-                    name: 'user_id',
-                    render () {
-                        return (
-                            <Input
-                                placeholder="请输入"
-                                v-model:value={ formData.user_id }
-                                onChange={ onNumberInput('user_id') }
-                            />
-                        )
-                    }
-                },
-                {
-                    label: '是否匹配',
-                    name: 'is_match',
-                    render () {
-                        return (
-                            <Checkbox v-model:checked={ formData.is_match }/>
                         )
                     }
                 }
             ]
 
             const customRender = {
-                except_arrive_time: (record) => {
+                role: (record) => {
                     return (
-                        <span>{ formatTime(record.except_arrive_time) }</span>
+                        <span>{ RolesName[record.role] || '--' }</span>
                     )
                 },
-                actual_arrive_time: (record) => {
+                status: (record) => {
                     return (
-                        <span>{ formatTime(record.actual_arrive_time) }</span>
-                    )
-                },
-                create_time: (record) => {
-                    return (
-                        <span>{ formatTime(record.create_time) }</span>
-                    )
-                },
-                consumer_amount: (record) => {
-                    return (
-                        <span>{ formatCurrency(record.consumer_amount / 100) }</span>
-                    )
-                },
-                is_match: (record) => {
-                    return (
-                        <span>{ record.is_match ? '是' : '否' }</span>
+                        <span>{ parseInt(record.status) === 1 ? '正常' : '离职' }</span>
                     )
                 },
                 action: (record) => {
@@ -410,22 +354,11 @@ export default defineComponent({
                     <Card bodyStyle={ { paddingTop: '0' } }>
                         <div class={ cx('table-list-toolbar') }>
                             <div class={ cx('table-list-toolbar-container') }>
-                                <div class={ cx('table-list-toolbar-title') }>报单列表</div>
+                                <div class={ cx('table-list-toolbar-title') }>员工列表</div>
                                 <Space size={ 12 }>
                                     <Button type="primary" onClick={ handleCreateRequest }>
-                                        报单登记
+                                        <PlusOutlined/>添加员工
                                     </Button>
-                                    <Tooltip getPopupContainer={ () => document.getElementById('viewContainer') }>
-                                        { {
-                                            title: () => <span>上传报单</span>,
-                                            default: () => (
-                                                <UploadOutlined
-                                                    class={ cx('upload') }
-                                                    onClick={ handleUploadReport }
-                                                />
-                                            )
-                                        } }
-                                    </Tooltip>
                                 </Space>
                             </div>
                         </div>
