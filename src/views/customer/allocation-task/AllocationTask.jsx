@@ -16,6 +16,7 @@ import {
 } from 'ant-design-vue'
 import { DownOutlined } from '@ant-design/icons-vue'
 import TableSearch from '@/components/table-search'
+import TableDrawer from './TableDrawer'
 import { requestCustomerServerList, requestCustomerServerResult } from '@/api/customer'
 import { formatCurrency } from '@/util/format'
 import dayjs from 'dayjs'
@@ -184,7 +185,8 @@ const ModalForm = defineComponent({
                             />
                         </FormItem>
                         <FormItem label="备注" name="desc" { ...defaultFormItemConfig }>
-                            <TextArea placeholder="请输入" v-model:value={ formData.desc } autosize={ { minRows: 4, maxRows: 4 } }/>
+                            <TextArea placeholder="请输入" v-model:value={ formData.desc }
+                                      autosize={ { minRows: 4, maxRows: 4 } }/>
                         </FormItem>
                     </Form>
                 </Modal>
@@ -196,6 +198,7 @@ const ModalForm = defineComponent({
 export default defineComponent({
     setup () {
         const modalFormRef = ref(null)
+        const tableDrawerRef = ref(null)
 
         const loading = ref(false)
         const dataSource = ref([])
@@ -317,6 +320,12 @@ export default defineComponent({
         function onServerResult (record) {
             return function () {
                 modalFormRef.value && modalFormRef.value.show(record)
+            }
+        }
+
+        function onServerHistory (record) {
+            return function () {
+                tableDrawerRef.value && tableDrawerRef.value.show(record.history || [])
             }
         }
 
@@ -448,7 +457,7 @@ export default defineComponent({
                                             <a class={ cx('action') } onClick={ onServerResult(record) }>回访</a>
                                         </MenuItem>
                                         <MenuItem>
-                                            <a class={ cx('action') }>回访历史</a>
+                                            <a class={ cx('action') } onClick={ onServerHistory(record) }>回访历史</a>
                                         </MenuItem>
                                     </Menu>
                                 )
@@ -470,7 +479,7 @@ export default defineComponent({
                         <Space size={ 0 }>
                             <a class={ cx('action') } onClick={ onServerResult(record) }>回访</a>
                             <Divider type="vertical"/>
-                            <a class={ cx('action') }>回访历史</a>
+                            <a class={ cx('action') } onClick={ onServerHistory(record) }>回访历史</a>
                         </Space>
                     )
                 }
@@ -507,6 +516,7 @@ export default defineComponent({
                         />
                     </Card>
                     <ModalForm ref={ modalFormRef } onFinish={ onFinish }/>
+                    <TableDrawer ref={ tableDrawerRef }/>
                 </div>
             )
         }
