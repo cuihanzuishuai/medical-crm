@@ -253,7 +253,9 @@ export default defineComponent({
             requestReportList(data)
                 .then((res) => {
                     dataSource.value = res.list
-                    pagination.total = res.page.total
+                    if (pagination.current === 1) {
+                        pagination.total = res.page.total
+                    }
                 })
                 .catch((err) => {
                     message.error({

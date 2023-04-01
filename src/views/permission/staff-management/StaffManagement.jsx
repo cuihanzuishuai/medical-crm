@@ -15,7 +15,6 @@ import { PlusOutlined } from '@ant-design/icons-vue'
 import TableSearch from '@/components/table-search'
 import { requestUserList, requestUserCreate } from '@/api/user'
 import { RolesName } from '@/permission'
-import dayjs from 'dayjs'
 import classNames from '@/common/classNamesBind'
 import styles from './style/index.module.scss'
 
@@ -217,10 +216,6 @@ export default defineComponent({
             }
         }
 
-        function formatTime (value) {
-            return dayjs.unix(value).format('YYYY-MM-DD HH:mm')
-        }
-
         function getDataSource () {
             const data = {
                 name: formData.name,
@@ -235,7 +230,9 @@ export default defineComponent({
             requestUserList(data)
                 .then((res) => {
                     dataSource.value = res.list
-                    pagination.total = res.page.total
+                    if (pagination.current === 1) {
+                        pagination.total = res.page.total
+                    }
                 })
                 .catch((err) => {
                     message.error({
@@ -261,12 +258,8 @@ export default defineComponent({
             getDataSource()
         }
 
-        function handleCreateRequest () {
+        function handleCreateUser () {
             modalFormRef.value && modalFormRef.value.show()
-        }
-
-        function handleUploadReport () {
-            console.log('上传')
         }
 
         return () => {
@@ -291,6 +284,7 @@ export default defineComponent({
                             <Input
                                 placeholder="请输入"
                                 v-model:value={ formData.mobile }
+                                onChange={ onNumberInput('mobile') }
                             />
                         )
                     }
@@ -356,7 +350,7 @@ export default defineComponent({
                             <div class={ cx('table-list-toolbar-container') }>
                                 <div class={ cx('table-list-toolbar-title') }>员工列表</div>
                                 <Space size={ 12 }>
-                                    <Button type="primary" onClick={ handleCreateRequest }>
+                                    <Button type="primary" onClick={ handleCreateUser }>
                                         <PlusOutlined/>添加员工
                                     </Button>
                                 </Space>
