@@ -13,7 +13,7 @@ import {
 } from 'ant-design-vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import TableSearch from '@/components/table-search'
-import { requestUserList, requestUserCreate } from '@/api/user'
+import { requestUserList, requestUserCreate, requestUserChangeStatus } from '@/api/user'
 import { RolesName } from '@/permission'
 import classNames from '@/common/classNamesBind'
 import styles from './style/index.module.scss'
@@ -47,12 +47,6 @@ const columns = [
         title: '在职状态',
         dataIndex: 'status',
         key: 'status'
-    },
-    {
-        title: '操作',
-        dataIndex: 'action',
-        key: 'action',
-        width: '80px'
     }
 ]
 
@@ -244,7 +238,28 @@ export default defineComponent({
                 })
         }
 
-        function onDelete (record) {
+        function onUserChangeStatus (record) {
+            return function () {
+                const data = {
+                    user_id: record.user_id
+                }
+                loading.value = true
+                requestUserChangeStatus(data)
+                    .then(() => {
+                        message.success({
+                            content: '操作成功'
+                        })
+                        onFinish()
+                    })
+                    .catch((err) => {
+                        message.error({
+                            content: err.message
+                        })
+                    })
+                    .finally(() => {
+                        loading.value = false
+                    })
+            }
         }
 
         function onFinish () {
@@ -313,19 +328,19 @@ export default defineComponent({
                     )
                 },
                 status: (record) => {
+                    if (parseInt(record.status) === 1) {
+                        return (
+                            <Popconfirm
+                                title="确定修改为离职?"
+                                onConfirm={ onUserChangeStatus(record) }
+                                getPopupContainer={ () => document.getElementById('viewContainer') }
+                            >
+                                <a>正常</a>
+                            </Popconfirm>
+                        )
+                    }
                     return (
-                        <span>{ parseInt(record.status) === 1 ? '正常' : '离职' }</span>
-                    )
-                },
-                action: (record) => {
-                    return (
-                        <Popconfirm
-                            title="确定要撤销?"
-                            onConfirm={ onDelete(record) }
-                            getPopupContainer={ () => document.getElementById('viewContainer') }
-                        >
-                            <a>撤销</a>
-                        </Popconfirm>
+                        <span>离职</span>
                     )
                 }
             }

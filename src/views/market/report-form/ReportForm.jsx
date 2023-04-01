@@ -86,6 +86,7 @@ const ModalForm = defineComponent({
         const formRef = ref(null)
 
         const visible = ref(false)
+        const loading = ref(false)
 
         const formData = reactive({
             consumer_mobile: '',
