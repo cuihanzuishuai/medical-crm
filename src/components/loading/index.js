@@ -1,9 +1,9 @@
 import { createVNode, render as vueRender } from 'vue'
 import LoadingCom from './Loading'
 
-function Loading () {
-    const container = document.createElement('div')
+const container = document.createElement('div')
 
+function Loading () {
     const nextProps = {
         doClose: doClose
     }
@@ -25,7 +25,13 @@ function Loading () {
         document.body.removeChild(container)
     }
 
+    Loading.destroy = destroy
+
     return destroy
+}
+
+Loading.destroy = function () {
+    document.body.removeChild(container)
 }
 
 export default Loading

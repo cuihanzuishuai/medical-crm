@@ -36,7 +36,7 @@ router.beforeEach((to, from, next) => {
         if (userinfo.hasGetInfo) {
             turnTo(to, next, userinfo.access)
         } else {
-            const loadingDestroy = Loading()
+            Loading()
             userinfo.getUserInfo()
                 .then((access) => {
                     turnTo(to, next, access)
@@ -56,7 +56,7 @@ router.beforeEach((to, from, next) => {
                     })
                 })
                 .finally(() => {
-                    loadingDestroy()
+                    Loading.destroy()
                 })
         }
     }

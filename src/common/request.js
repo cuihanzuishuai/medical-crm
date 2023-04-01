@@ -2,6 +2,7 @@ import axios from 'axios'
 import { baseURL, LOGIN_NAME } from '@/config'
 import { getToken, removeToken } from '@/common/auth'
 import { Modal } from 'ant-design-vue'
+import Loading from '@/components/loading'
 import router from '@/router'
 
 function addErrorLog (err) {
@@ -63,6 +64,7 @@ instance.interceptors.response.use(
         }
         if (/ExpireToken/.test(err.code)) {
             onExpireToken(err)
+            Loading.destroy()
             return new Promise(() => ({}))
         }
         // addErrorLog(err.response)

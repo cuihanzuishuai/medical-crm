@@ -165,12 +165,12 @@ const routes = [
         component: LayoutMain,
         children: [
             {
-                path: 'add-staff',
-                name: 'add-staff',
+                path: 'staff-management',
+                name: 'staff-management',
                 meta: {
-                    title: '添加员工'
+                    title: '员工管理'
                 },
-                component: () => import('@/views/permission/add-staff')
+                component: () => import('@/views/permission/staff-management')
             },
             {
                 path: 'allocation-role',
@@ -179,14 +179,6 @@ const routes = [
                     title: '角色分配'
                 },
                 component: () => import('@/views/permission/allocation-role')
-            },
-            {
-                path: 'staff-management',
-                name: 'staff-management',
-                meta: {
-                    title: '员工管理'
-                },
-                component: () => import('@/views/permission/staff-management')
             }
         ]
     },
