@@ -1,5 +1,5 @@
 import { defineComponent, ref } from 'vue'
-import { BackTop } from 'ant-design-vue'
+// import { BackTop } from 'ant-design-vue'
 import { RouterView } from 'vue-router'
 import classNames from '@/common/classNamesBind'
 import styles from './style/content.module.scss'
@@ -19,7 +19,7 @@ export default defineComponent({
                             <div class={ cx('content__view') }>
                                 <RouterView/>
                             </div>
-                            <BackTop target={ () => spaceRef.value }/>
+                            {/*<BackTop target={ () => spaceRef.value }/>*/}
                             <div class={ cx('content__fill') }/>
                         </div>
                     </div>
