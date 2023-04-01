@@ -453,10 +453,10 @@ export default defineComponent({
                             overlay: () => {
                                 return (
                                     <Menu>
-                                        <MenuItem>
+                                        <MenuItem key="回访">
                                             <a class={ cx('action') } onClick={ onServerResult(record) }>回访</a>
                                         </MenuItem>
-                                        <MenuItem>
+                                        <MenuItem key="回访历史">
                                             <a class={ cx('action') } onClick={ onServerHistory(record) }>回访历史</a>
                                         </MenuItem>
                                     </Menu>
