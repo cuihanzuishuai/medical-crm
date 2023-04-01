@@ -16,6 +16,10 @@ export default defineComponent({
         const router = useRouter()
         const userinfo = useUserinfo()
 
+        function handleChangePassword () {
+            // 跳转修改密码页
+        }
+
         function handleLogOut () {
             removeToken()
             router.push({ name: LOGIN_NAME })
@@ -38,6 +42,7 @@ export default defineComponent({
                     return (
                         <div class={ cx('user-card') }>
                             <div class={ cx('item__text', 'no-style') }>{ userinfo.name || '--' }</div>
+                            <div class={ cx('item__text') } onClick={ handleChangePassword }>修改密码</div>
                             <div class={ cx('item__text') } onClick={ handleLogOut }>退出登录</div>
                         </div>
                     )

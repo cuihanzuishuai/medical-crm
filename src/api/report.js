@@ -47,3 +47,25 @@ export function requestReportList (data) {
             })
     })
 }
+
+/**
+ * 上传文件
+ * @returns {Promise<unknown>}
+ */
+export function requestReportImport (file) {
+    const formData = new FormData()
+    formData.append('name', file.name)
+    formData.append('file', file)
+    return new Promise((resolve, reject) => {
+        request.post('/api/report/import', formData, {
+            'Content-Type': 'multipart/form-data;'
+        })
+            .then((res) => {
+                resolve(res.data)
+            })
+            .catch((err) => {
+                reject(err)
+            })
+    })
+}
+

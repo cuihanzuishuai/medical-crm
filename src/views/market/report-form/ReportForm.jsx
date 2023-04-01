@@ -12,11 +12,12 @@ import {
     Space,
     Select,
     Tooltip,
-    Tag
+    Tag,
+    Upload
 } from 'ant-design-vue'
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import TableSearch from '@/components/table-search'
-import { requestReportList, requestReportRecover, requestReportCreate } from '@/api/report'
+import { requestReportList, requestReportRecover, requestReportCreate, requestReportImport } from '@/api/report'
 import { formatCurrency } from '@/util/format'
 import dayjs from 'dayjs'
 import classNames from '@/common/classNamesBind'
@@ -327,8 +328,19 @@ export default defineComponent({
             modalFormRef.value && modalFormRef.value.show()
         }
 
-        function handleUploadReport () {
-            console.log('上传')
+        function onUploadReportChange (evt) {
+            requestReportImport(evt.file)
+                .then(() => {
+                    message.success({
+                        content: '上传成功'
+                    })
+                    onFinish()
+                })
+                .catch((err) => {
+                    message.error({
+                        content: err.message
+                    })
+                })
         }
 
         return () => {
@@ -473,10 +485,13 @@ export default defineComponent({
                                         { {
                                             title: () => <span>上传报单</span>,
                                             default: () => (
-                                                <UploadOutlined
-                                                    class={ cx('upload') }
-                                                    onClick={ handleUploadReport }
-                                                />
+                                                <Upload
+                                                    onChange={ onUploadReportChange }
+                                                    fileList={ [] }
+                                                    beforeUpload={ () => false }
+                                                >
+                                                    <UploadOutlined class={ cx('upload') }/>
+                                                </Upload>
                                             )
                                         } }
                                     </Tooltip>
