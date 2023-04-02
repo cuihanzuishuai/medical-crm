@@ -194,6 +194,14 @@ const routes = [
         ]
     },
     {
+        path: '/security',
+        name: 'security',
+        meta: {
+            hideInMenu: true
+        },
+        component: () => import('@/views/security')
+    },
+    {
         path: '/401',
         name: 'error-401',
         meta: {

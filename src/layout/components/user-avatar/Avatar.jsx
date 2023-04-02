@@ -17,7 +17,7 @@ export default defineComponent({
         const userinfo = useUserinfo()
 
         function handleChangePassword () {
-            // 跳转修改密码页
+            router.push({ name: 'security' })
         }
 
         function handleLogOut () {
