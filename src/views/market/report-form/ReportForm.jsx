@@ -376,11 +376,11 @@ export default defineComponent({
         const dataSource = ref([])
         const rowSelection = reactive({
             selectedRowKeys: [],
-            getCheckboxProps: (record) => {
-                return {
-                    disabled: !!record.relation_task
-                }
-            },
+            // getCheckboxProps: (record) => {
+            //     return {
+            //         disabled: !!record.relation_task
+            //     }
+            // },
             onChange: onSelectChange
         })
         const pagination = reactive({
