@@ -47,52 +47,89 @@ const MatchEnum = {
     }
 }
 
+const RelationTaskEnum = {
+    1: {
+        value: 1,
+        label: '是',
+        color: 'blue'
+    },
+    2: {
+        value: 2,
+        label: '否',
+        color: 'red'
+    }
+}
+
 const columns = [
     {
+        index: 1,
         title: '客户姓名',
         dataIndex: 'consumer_name',
         key: 'consumer_name'
     },
     {
+        index: 2,
         title: '客户电话',
         dataIndex: 'consumer_mobile',
         key: 'consumer_mobile'
     },
     {
+        index: 3,
         title: '预期到访时间',
         dataIndex: 'except_arrive_time',
         key: 'except_arrive_time'
     },
     {
+        index: 4,
         title: '到访时间',
         dataIndex: 'actual_arrive_time',
         key: 'actual_arrive_time'
     },
     {
-        title: '员工名称',
-        dataIndex: 'user_name',
-        key: 'user_name'
-    },
-    {
-        title: '创建时间',
-        dataIndex: 'create_time',
-        key: 'create_time'
-    },
-    {
+        index: 5,
         title: '是否匹配',
         dataIndex: 'is_match',
         key: 'is_match'
     },
     {
+        index: 6,
+        title: '员工名称',
+        dataIndex: 'user_name',
+        key: 'user_name'
+    },
+    {
+        index: 7,
+        title: '创建时间',
+        dataIndex: 'create_time',
+        key: 'create_time'
+    },
+    {
+        index: 10,
         title: '消费金额',
         dataIndex: 'consumer_amount',
         key: 'consumer_amount'
     },
     {
+        index: 11,
         title: '操作',
         dataIndex: 'action',
         key: 'action',
         width: '80px'
+    }
+]
+
+const permissionColumns = [
+    {
+        index: 8,
+        title: '是否分配',
+        dataIndex: 'relation_task',
+        key: 'relation_task'
+    },
+    {
+        index: 9,
+        title: '客服名称',
+        dataIndex: 'relation_task_username',
+        key: 'relation_task_username'
     }
 ]
 
@@ -339,6 +376,11 @@ export default defineComponent({
         const dataSource = ref([])
         const rowSelection = reactive({
             selectedRowKeys: [],
+            getCheckboxProps: (record) => {
+                return {
+                    disabled: !!record.relation_task
+                }
+            },
             onChange: onSelectChange
         })
         const pagination = reactive({
@@ -398,6 +440,7 @@ export default defineComponent({
                 user_id: formData.user_id ? parseInt(formData.user_id) : 0,  // 员工id
                 user_name: formData.user_name, // 员工姓名
                 is_match: formData.is_match || 0, // 是否匹配
+                relation_task: hasAccess([Role.Admin, Role.RoleCustomManager]),
                 page: {
                     current_page: pagination.current,
                     page_size: pagination.pageSize
@@ -412,6 +455,7 @@ export default defineComponent({
                             key: item.id
                         }
                     })
+                    console.log(dataSource.value)
                     if (pagination.current === 1) {
                         pagination.total = res.page.total
                     }
@@ -587,6 +631,15 @@ export default defineComponent({
                     }
                     return <span>--</span>
                 },
+                relation_task: (record) => {
+                    const data = RelationTaskEnum[record.relation_task] || (record.relation_task ? RelationTaskEnum['1'] : RelationTaskEnum['2'])
+                    if (data) {
+                        return (
+                            <Tag color={ data.color }>{ data.label }</Tag>
+                        )
+                    }
+                    return <span>--</span>
+                },
                 action: (record) => {
                     return (
                         <Popconfirm
@@ -609,6 +662,10 @@ export default defineComponent({
             }
 
             const hasPermission = hasAccess([Role.Admin, Role.RoleCustomManager])
+
+            const tableColumns = hasPermission ? (
+                [...columns, ...permissionColumns].sort((a, b) => a.index - b.index)
+            ) : columns
 
             return (
                 <div class={ cx('view-wrap') }>
@@ -656,7 +713,7 @@ export default defineComponent({
                         </div>
                         <Table
                             loading={ loading.value }
-                            columns={ columns }
+                            columns={ tableColumns }
                             dataSource={ dataSource.value }
                             pagination={ pagination }
                             rowSelection={ hasPermission ? rowSelection : false }
