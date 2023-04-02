@@ -90,7 +90,7 @@ const routes = [
                 path: 'allocation-task',
                 name: 'allocation-task',
                 meta: {
-                    title: '任务分配',
+                    title: '回访记录',
                     icon: 'icon-kefu'
                 },
                 component: () => import('@/views/customer/allocation-task')

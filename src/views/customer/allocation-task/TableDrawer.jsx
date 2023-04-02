@@ -4,14 +4,14 @@ import dayjs from 'dayjs'
 
 const columns = [
     {
-        title: '客服名称',
-        dataIndex: 'name',
-        key: 'name'
-    },
-    {
         title: '客服ID',
         dataIndex: 'user_id',
         key: 'user_id'
+    },
+    {
+        title: '客服名称',
+        dataIndex: 'name',
+        key: 'name'
     },
     {
         title: '时间',
@@ -54,7 +54,7 @@ export default defineComponent({
             const customRender = {
                 time: (record) => {
                     return (
-                        <span>{ formatTime(record.finish_time) }</span>
+                        <span>{ formatTime(record.time) }</span>
                     )
                 }
             }

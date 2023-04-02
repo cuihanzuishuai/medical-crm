@@ -455,7 +455,6 @@ export default defineComponent({
                             key: item.id
                         }
                     })
-                    console.log(dataSource.value)
                     if (pagination.current === 1) {
                         pagination.total = res.page.total
                     }
