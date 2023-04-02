@@ -12,7 +12,6 @@ const cx = classNames.bind(styles)
 const FormItem = Form.Item
 const InputPassword = Input.Password
 
-
 const defaultFormItemConfig = {
     labelCol: {
         style: 'flex: 0 0 84px'

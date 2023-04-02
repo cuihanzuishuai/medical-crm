@@ -14,7 +14,7 @@ const cx = classNames.bind(styles)
 const FormItem = Form.Item
 const InputPassword = Input.Password
 
-const WRAPPER_COL = {
+const wrapperCol = {
     span: 24
 }
 
@@ -110,14 +110,14 @@ export default defineComponent({
                         </div>
                         <div class={ cx('form-wrap') }>
                             <Form model={ loginForm } rules={ rules } onFinish={ onSubmit }>
-                                <FormItem name="username" wrapperCol={ WRAPPER_COL }>
+                                <FormItem name="username" wrapperCol={ wrapperCol }>
                                     <Input
                                         placeholder="请输入手机号"
                                         v-model:value={ loginForm.username }
                                         v-slots={ usernameSlots }
                                     />
                                 </FormItem>
-                                <FormItem name="password" wrapperCol={ WRAPPER_COL }>
+                                <FormItem name="password" wrapperCol={ wrapperCol }>
                                     <InputPassword
                                         placeholder="请输入密码"
                                         v-model:value={ loginForm.password }
@@ -128,7 +128,7 @@ export default defineComponent({
                                     <Checkbox v-model:checked={ checked.value }>记住账号</Checkbox>
                                     {/*<a href="http://www.baidu.com" target="_blank">忘记密码</a>*/ }
                                 </div>
-                                <FormItem wrapperCol={ WRAPPER_COL } validateStatus="error" help={ errorType.value }>
+                                <FormItem wrapperCol={ wrapperCol } validateStatus="error" help={ errorType.value }>
                                     <Button type="primary" html-type="submit" block={ true } loading={ loading.value }>
                                         登录
                                     </Button>
