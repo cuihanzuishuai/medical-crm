@@ -10,20 +10,13 @@ import {
     Select,
     Tag,
     Space,
-    Divider,
-    Button,
-    Spin
+    Divider
 } from 'ant-design-vue'
-import { PlusOutlined } from '@ant-design/icons-vue'
 import TableSearch from '@/components/table-search'
 import TableDrawer from './TableDrawer'
-import { requestCustomerServerList, requestCustomerServerResult, requestCustomerServerDistribute } from '@/api/customer'
-import { requestUserList } from '@/api/user'
-import { debounce } from 'lodash-es'
+import { requestCustomerServerList, requestCustomerServerResult } from '@/api/customer'
 import { formatCurrency } from '@/util/format'
 import dayjs from 'dayjs'
-import * as Role from '@/permission'
-import hasAccess from '@/permission/hasAccess'
 import classNames from '@/common/classNamesBind'
 import styles from './style/index.module.scss'
 
@@ -199,139 +192,13 @@ const ModalForm = defineComponent({
     }
 })
 
-const ModalSearch = defineComponent({
-    emits: ['finish'],
-    setup (props, { expose, emit }) {
-        const formRef = ref(null)
-        const visible = ref(false)
-        const loading = ref(false)
-
-        const searching = ref(false)
-        const options = ref([])
-
-        let reportIds = null
-
-        const formData = reactive({
-            user_id: undefined
-        })
-
-        const rules = {
-            user_id: [{
-                required: true,
-                message: '员工不能为空'
-            }]
-        }
-
-        const onSearch = debounce(function onSearch (value) {
-            if (!value) return
-            const data = {
-                name: value,
-                page: {
-                    current_page: 1,
-                    page_size: 10
-                }
-            }
-            searching.value = true
-            requestUserList(data)
-                .then((res) => {
-                    options.value = res.list.map((item) => {
-                        return {
-                            value: item.user_id,
-                            label: `${ item.name }(${ item.mobile })`
-                        }
-                    })
-                })
-                .finally(() => {
-                    searching.value = false
-                })
-        }, 300)
-
-        function customerServerDistribute (values) {
-            const data = {
-                user_id: values.user_id,
-                report_ids: [...reportIds]
-            }
-            loading.value = true
-            requestCustomerServerDistribute(data)
-                .then((res) => {
-                    message.success({
-                        content: '操作成功'
-                    })
-                    emit('finish')
-                    visible.value = false
-                })
-                .catch((err) => {
-                    message.error({
-                        content: err.message
-                    })
-                })
-                .finally(() => {
-                    loading.value = false
-                })
-        }
-
-        async function onFinish () {
-            const values = await formRef.value.validateFields()
-            customerServerDistribute(values)
-        }
-
-        function show (list) {
-            reportIds = list
-            visible.value = true
-        }
-
-        expose({
-            show
-        })
-
-        return () => {
-            const selectSlots = {
-                notFoundContent: () => {
-                    return <Spin size="small"/>
-                }
-            }
-
-            return (
-                <Modal
-                    title="任务分配"
-                    v-model:visible={ visible.value }
-                    confirmLoading={ loading.value }
-                    onOk={ onFinish }
-                    maskClosable={ false }
-                >
-                    <Form ref={ formRef } model={ formData } rules={ rules } validateTrigger={ ['blur'] }>
-                        <FormItem name="user_id">
-                            <Select
-                                placeholder="搜索员工姓名"
-                                showArrow={ false }
-                                showSearch={ true }
-                                filterOption={ false }
-                                v-model:value={ formData.user_id }
-                                options={ options.value }
-                                onSearch={ onSearch }
-                                notFoundContent={ searching.value ? undefined : null }
-                                v-slots={ searching.value ? selectSlots : undefined }
-                            />
-                        </FormItem>
-                    </Form>
-                </Modal>
-            )
-        }
-    }
-})
-
 export default defineComponent({
     setup () {
-        const modalSearchRef = ref(null)
         const modalFormRef = ref(null)
         const tableDrawerRef = ref(null)
 
         const loading = ref(false)
         const dataSource = ref([])
-        const rowSelection = reactive({
-            selectedRowKeys: [],
-            onChange: onSelectChange
-        })
         const pagination = reactive({
             showQuickJumper: false,
             showSizeChanger: false,
@@ -362,15 +229,11 @@ export default defineComponent({
         function formatTime (value) {
             const timeStr = String(value)
             if ((timeStr.length === 13)) {
-                return dayjs(value).format('YYYY-MM-DD HH:mm')
+                return dayjs(value).format('YYYY.MM.DD HH:mm')
             } else if (timeStr.length === 10) {
-                return dayjs.unix(value).format('YYYY-MM-DD HH:mm')
+                return dayjs.unix(value).format('YYYY.MM.DD HH:mm')
             }
             return '--'
-        }
-
-        function onSelectChange (selectedRowKeys) {
-            rowSelection.selectedRowKeys = selectedRowKeys
         }
 
         function getStartAndEndTime (times) {
@@ -424,18 +287,12 @@ export default defineComponent({
         function onFinish () {
             pagination.current = 1
             pagination.total = 0
-            rowSelection.selectedRowKeys = []
             getDataSource()
         }
 
         function onChange (page) {
             pagination.current = page.current
-            rowSelection.selectedRowKeys = []
             getDataSource()
-        }
-
-        function onServerDistribute () {
-            modalSearchRef.value && modalSearchRef.value.show(rowSelection.selectedRowKeys)
         }
 
         function onServerResult (record) {
@@ -576,8 +433,6 @@ export default defineComponent({
                 }
             }
 
-            const hasPermission = hasAccess([Role.Admin, Role.RoleCustomManager])
-
             return (
                 <div class={ cx('view-wrap') }>
                     <TableSearch
@@ -590,17 +445,6 @@ export default defineComponent({
                         <div class={ cx('table-list-toolbar') }>
                             <div class={ cx('table-list-toolbar-container') }>
                                 <div class={ cx('table-list-toolbar-title') }>任务列表</div>
-                                {
-                                    hasPermission ? (
-                                        <Button
-                                            type="primary"
-                                            disabled={ rowSelection.selectedRowKeys.length === 0 }
-                                            onClick={ onServerDistribute }
-                                        >
-                                            <PlusOutlined/>任务分配
-                                        </Button>
-                                    ) : null
-                                }
                             </div>
                         </div>
                         <Table
@@ -608,12 +452,10 @@ export default defineComponent({
                             columns={ columns }
                             dataSource={ dataSource.value }
                             pagination={ pagination }
-                            rowSelection={ hasPermission ? rowSelection : false }
                             onChange={ onChange }
                             v-slots={ tableSlots }
                         />
                     </Card>
-                    <ModalSearch ref={ modalSearchRef } onFinish={ onFinish }/>
                     <ModalForm ref={ modalFormRef } onFinish={ onFinish }/>
                     <TableDrawer ref={ tableDrawerRef }/>
                 </div>
