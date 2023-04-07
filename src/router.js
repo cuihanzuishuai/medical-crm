@@ -40,10 +40,6 @@ router.beforeEach((to, from, next) => {
             userinfo.getUserInfo()
                 .then((access) => {
                     turnTo(to, next, access)
-
-                    setTimeout(() => {
-                        userinfo.getUserInfo()
-                    }, 1000)
                 })
                 .catch((err) => {
                     removeToken()

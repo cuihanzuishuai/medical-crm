@@ -18,11 +18,11 @@ function addErrorLog (err) {
 }
 
 function onExpireToken (err) {
+    removeToken()
     Modal.error({
         title: 'Error',
         content: err.message,
         onOk: () => {
-            removeToken()
             router.replace({ name: LOGIN_NAME })
         }
     })
