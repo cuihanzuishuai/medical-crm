@@ -6,8 +6,8 @@ scp -r ./dist ubuntu@124.222.33.20:/home/ubuntu/Project/foreend/
 
 echo "推送成功"
 
-## sudo rm -rf /var/www/html/dist
-## sudo mv /home/ubuntu/Project/foreend/dist /var/www/html/
+## sudo rm -rf /usr/local/foreend/dist
+## sudo mv /home/ubuntu/Project/foreend/dist /usr/local/foreend/
 
 
 
