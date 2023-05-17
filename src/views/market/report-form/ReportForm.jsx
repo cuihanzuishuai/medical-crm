@@ -18,7 +18,7 @@ import {
 } from 'ant-design-vue'
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import TableSearch from '@/components/table-search'
-import { requestReportList, requestReportRecover, requestReportCreate, requestReportImport } from '@/api/report'
+import { requestReportList, requestReportRecover, requestReportCreate, requestReportImport, reportChangeActualArrivedTime, reportChangeMatch } from '@/api/report'
 import { requestCustomerServerDistribute } from '@/api/customer'
 import { requestUserList } from '@/api/user'
 import { debounce } from 'lodash-es'
@@ -114,7 +114,7 @@ const columns = [
         title: '操作',
         dataIndex: 'action',
         key: 'action',
-        width: '80px'
+        width: '110px'
     }
 ]
 
@@ -366,11 +366,136 @@ const ModalSearch = defineComponent({
     }
 })
 
+const ModalChange = defineComponent({
+    emits: ['finish'],
+    setup (props, { expose, emit }) {
+        const formRef = ref(null)
+
+        let reportId = null
+
+        const visible = ref(false)
+        const loading = ref(false)
+
+        const formData = reactive({
+            is_match: undefined,
+            actual_arrive_time: null
+        })
+
+        const rules = {
+            is_match: [{
+                required: true,
+                message: '请选择'
+            }],
+            actual_arrive_time: [{
+                required: true,
+                message: '到访时间不能为空'
+            }]
+        }
+
+        function onChangeReport (values) {
+            const data1 = {
+                id: reportId,
+                time: values.actual_arrive_time ? values.actual_arrive_time.unix() : 0
+            }
+            const data2 = {
+                id: reportId,
+                is_match: values.is_match || 0,
+            }
+            loading.value = true
+            Promise.all([reportChangeActualArrivedTime(data1), reportChangeMatch(data2)])
+                .then((res) => {
+                    message.success({
+                        content: '修改成功'
+                    })
+                    emit('finish')
+                    visible.value = false
+                })
+                .catch((err) => {
+                    message.error({
+                        content: err.message
+                    })
+                })
+                .finally(() => {
+                    loading.value = false
+                })
+        }
+
+        async function onFinish () {
+            const values = await formRef.value.validateFields()
+            onChangeReport(values)
+        }
+
+        function initTime (value) {
+            const timeStr = String(value)
+            if ((timeStr.length === 13)) {
+                return dayjs(value)
+            } else if (timeStr.length === 10) {
+                return dayjs.unix(value)
+            }
+            return null
+        }
+
+        function show (record) {
+            formRef.value && formRef.value.resetFields()
+            reportId = record.id
+            const n = parseInt(record.is_match)
+            formData.is_match = isNaN(n) ? undefined : n
+            formData.actual_arrive_time = initTime(record.actual_arrive_time)
+            visible.value = true
+        }
+
+        expose({
+            show
+        })
+
+        return () => {
+            const defaultFormItemConfig = {
+                labelCol: {
+                    style: 'flex: 0 0 120px'
+                },
+                wrapperCol: {
+                    style: 'max-width: calc(100% - 120px)'
+                }
+            }
+            const options = Object.keys(MatchEnum).map((key) => {
+                return MatchEnum[key]
+            })
+            const hasPermission = hasAccess([Role.Admin])
+            return (
+                <Modal
+                    title="报单修改"
+                    v-model:visible={ visible.value }
+                    confirmLoading={ loading.value }
+                    onOk={ onFinish }
+                    maskClosable={ false }
+                >
+                    <Form ref={ formRef } model={ formData } rules={ rules } validateTrigger={ ['blur'] }>
+                        {
+                            hasPermission ? (
+                                <FormItem label="是否匹配" name="is_match" { ...defaultFormItemConfig }>
+                                    <Select
+                                        placeholder="请选择"
+                                        v-model:value={ formData.is_match }
+                                        options={ options }
+                                    />
+                                </FormItem>
+                            ) : null
+                        }
+                        <FormItem label="到访时间" name="actual_arrive_time" { ...defaultFormItemConfig }>
+                            <DatePicker showTime={ true } v-model:value={ formData.actual_arrive_time }/>
+                        </FormItem>
+                    </Form>
+                </Modal>
+            )
+        }
+    }
+})
 
 export default defineComponent({
     setup () {
         const modalSearchRef = ref(null)
         const modalFormRef = ref(null)
+        const modalChangeRef = ref(null)
 
         const loading = ref(false)
         const dataSource = ref([])
@@ -395,6 +520,7 @@ export default defineComponent({
         })
         const formData = reactive({
             consumer_mobile: '', // 客户电话
+            arrive_time: '', // 到访时间
             creat_time: null, // 报单开始时间 // 报单结束时间
             user_id: '',  // 员工id
             user_name: '', // 员工姓名
@@ -412,9 +538,9 @@ export default defineComponent({
         function formatTime (value) {
             const timeStr = String(value)
             if ((timeStr.length === 13)) {
-                return dayjs(value).format('YYYY.MM.DD HH:mm')
+                return dayjs(value).format('YYYY/MM/DD')
             } else if (timeStr.length === 10) {
-                return dayjs.unix(value).format('YYYY.MM.DD HH:mm')
+                return dayjs.unix(value).format('YYYY/MM/DD')
             }
             return '--'
         }
@@ -433,10 +559,13 @@ export default defineComponent({
 
         function getDataSource () {
             const time = getStartAndEndTime(formData.creat_time)
+            const arriveTime = getStartAndEndTime(formData.arrive_time)
             const data = {
                 consumer_mobile: formData.consumer_mobile,
                 create_start_time: time.startTime,// 报单开始时间
                 creat_end_time: time.endTime, // 报单结束时间
+                arrive_start_time: arriveTime.startTime, // 到访开始时间
+                arrive_end_time: arriveTime.endTime, // 到访结束时间
                 user_id: formData.user_id ? parseInt(formData.user_id) : 0,  // 员工id
                 user_name: formData.user_name, // 员工姓名
                 is_match: formData.is_match || 0, // 是否匹配
@@ -500,10 +629,16 @@ export default defineComponent({
             getDataSource()
         }
 
-        function onChange (page) {
+        function onTableChange (page) {
             pagination.current = page.current
             rowSelection.selectedRowKeys = []
             getDataSource()
+        }
+
+        function onTableEdit (item) {
+            return function () {
+                modalChangeRef.value && modalChangeRef.value.show(item)
+            }
         }
 
         function onServerDistribute () {
@@ -552,6 +687,18 @@ export default defineComponent({
                                 placeholder="请输入"
                                 v-model:value={ formData.consumer_mobile }
                                 onChange={ onNumberInput('consumer_mobile') }
+                            />
+                        )
+                    }
+                },
+                {
+                    label: '到访时间',
+                    name: 'arrive_time',
+                    render () {
+                        return (
+                            <RangePicker
+                                v-model:value={ formData.arrive_time }
+                                getPopupContainer={ () => document.getElementById('viewContainer') }
                             />
                         )
                     }
@@ -641,14 +788,17 @@ export default defineComponent({
                 },
                 action: (record) => {
                     return (
-                        <Popconfirm
-                            title="确定要撤销?"
-                            placement="topRight"
-                            onConfirm={ onDelete(record) }
-                            getPopupContainer={ () => document.getElementById('viewContainer') }
-                        >
-                            <a class={ cx('action') }>撤销</a>
-                        </Popconfirm>
+                        <Space>
+                            <Popconfirm
+                                title="确定要撤销?"
+                                placement="top"
+                                onConfirm={ onDelete(record) }
+                                getPopupContainer={ () => document.getElementById('viewContainer') }
+                            >
+                                <a class={ cx('action') }>撤销</a>
+                            </Popconfirm>
+                            <a className={ cx('action') } onClick={ onTableEdit(record) }>编辑</a>
+                        </Space>
                     )
                 }
             }
@@ -716,12 +866,13 @@ export default defineComponent({
                             dataSource={ dataSource.value }
                             pagination={ pagination }
                             rowSelection={ hasPermission ? rowSelection : false }
-                            onChange={ onChange }
+                            onChange={ onTableChange }
                             v-slots={ tableSlots }
                         />
                     </Card>
                     <ModalSearch ref={ modalSearchRef } onFinish={ onFinish }/>
                     <ModalForm ref={ modalFormRef } onFinish={ onFinish }/>
+                    <ModalChange ref={ modalChangeRef } onFinish={ onFinish }/>
                 </div>
             )
         }

@@ -34,9 +34,9 @@ export default defineComponent({
         function formatTime (value) {
             const timeStr = String(value)
             if ((timeStr.length === 13)) {
-                return dayjs(value).format('YYYY.MM.DD HH:mm')
+                return dayjs(value).format('YYYY/MM/DD')
             } else if (timeStr.length === 10) {
-                return dayjs.unix(value).format('YYYY.MM.DD HH:mm')
+                return dayjs.unix(value).format('YYYY/MM/DD')
             }
             return '--'
         }

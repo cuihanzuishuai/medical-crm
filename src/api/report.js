@@ -69,3 +69,28 @@ export function requestReportImport (file) {
     })
 }
 
+// 报单到访时间修改.
+export function reportChangeActualArrivedTime (data) {
+    return new Promise((resolve, reject) => {
+        request.post('/api/report/actual_arrived_time', data)
+            .then((res) => {
+                resolve(res.data)
+            })
+            .catch((err) => {
+                reject(err)
+            })
+    })
+}
+
+// 报单匹配修改.
+export function reportChangeMatch (data) {
+    return new Promise((resolve, reject) => {
+        request.post('/api/report/match', data)
+            .then((res) => {
+                resolve(res.data)
+            })
+            .catch((err) => {
+                reject(err)
+            })
+    })
+}
