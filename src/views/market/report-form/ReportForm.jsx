@@ -111,6 +111,12 @@ const columns = [
     },
     {
         index: 11,
+        title: '标签',
+        dataIndex: 'tag',
+        key: 'tag'
+    },
+    {
+        index: 11,
         title: '操作',
         dataIndex: 'action',
         key: 'action',
@@ -524,7 +530,8 @@ export default defineComponent({
             creat_time: null, // 报单开始时间 // 报单结束时间
             user_id: '',  // 员工id
             user_name: '', // 员工姓名
-            is_match: undefined // 是否匹配
+            is_match: undefined, // 是否匹配,
+            tag: '' // 标签
         })
 
         getDataSource()
@@ -569,6 +576,7 @@ export default defineComponent({
                 user_id: formData.user_id ? parseInt(formData.user_id) : 0,  // 员工id
                 user_name: formData.user_name, // 员工姓名
                 is_match: formData.is_match || 0, // 是否匹配
+                tag: formData.tag, // 标签
                 relation_task: hasAccess([Role.Admin, Role.RoleCustomManager]),
                 page: {
                     current_page: pagination.current,
@@ -741,7 +749,19 @@ export default defineComponent({
                             />
                         )
                     }
-                }
+                },
+                {
+                    label: '标签',
+                    name: 'tag',
+                    render () {
+                        return (
+                            <Input
+                                placeholder="请输入"
+                                v-model:value={ formData.tag }
+                            />
+                        )
+                    }
+                },
             ]
 
             const customRender = {
